@@ -1,18 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'NOOR SUPER MART - B2B Distribution System')</title>
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
     <!-- Bootstrap 5.3 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+
+    <!-- 👉 ১. এখানে পেজ-ওয়াইজ CSS এর জন্য stack যোগ করো -->
+    @stack('styles')
 </head>
+
 <body>
 
     <!-- Top Header Navbar Inclusion -->
@@ -41,5 +48,11 @@
         // Initialize Lucide Icons
         lucide.createIcons();
     </script>
+
+    <!-- 👉 ২. এখানে পেজ-ওয়াইজ JS এর জন্য stack যোগ করো -->
+    @stack('scripts')
+
+
 </body>
+
 </html>

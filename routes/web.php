@@ -12,6 +12,12 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\BrandController;
+use App\Http\Controllers\AreaController;
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\PurchaseController;
+
 
 // ১. রুট ইউআরএল ('/') ওপেন করলে সরাসরি লগইন পেজে রিডাইরেক্ট করবে
 Route::get('/', function () {
@@ -46,6 +52,44 @@ Route::middleware(['auth', 'role:Owner|Office'])->group(function () {
     Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
     Route::put('/categories/{category}', [CategoryController::class, 'update'])->name('categories.update');
     Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
+
+    // Brands Routes
+    Route::get('/brands', [BrandController::class, 'index'])->name('brands.index');
+    Route::post('/brands', [BrandController::class, 'store'])->name('brands.store');
+    Route::put('/brands/{brand}', [BrandController::class, 'update'])->name('brands.update');
+    Route::delete('/brands/{brand}', [BrandController::class, 'destroy'])->name('brands.destroy');
+
+    // Areas Routes
+    Route::get('/areas', [AreaController::class, 'index'])->name('areas.index');
+    Route::post('/areas', [AreaController::class, 'store'])->name('areas.store');
+    Route::put('/areas/{area}', [AreaController::class, 'update'])->name('areas.update');
+    Route::delete('/areas/{area}', [AreaController::class, 'destroy'])->name('areas.destroy');
+
+    // Customers Routes
+    Route::get('/customers', [CustomerController::class, 'index'])->name('customers.index');
+    Route::post('/customers', [CustomerController::class, 'store'])->name('customers.store');
+    Route::put('/customers/{customer}', [CustomerController::class, 'update'])->name('customers.update');
+    Route::delete('/customers/{customer}', [CustomerController::class, 'destroy'])->name('customers.destroy');
+
+
+    // Products Routes
+    Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+    Route::post('/products', [ProductController::class, 'store'])->name('products.store');
+    Route::put('/products/{product}', [ProductController::class, 'update'])->name('products.update');
+    Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
+
+    // Suppliers Routes
+    Route::get('/suppliers', [SupplierController::class, 'index'])->name('suppliers.index');
+    Route::post('/suppliers', [SupplierController::class, 'store'])->name('suppliers.store');
+    Route::put('/suppliers/{supplier}', [SupplierController::class, 'update'])->name('suppliers.update');
+    Route::delete('/suppliers/{supplier}', [SupplierController::class, 'destroy'])->name('suppliers.destroy');
+
+
+    // Purchases Routes
+    Route::get('/purchases', [PurchaseController::class, 'index'])->name('purchases.index');
+    Route::get('/purchases/create', [PurchaseController::class, 'create'])->name('purchases.create');
+    Route::post('/purchases', [PurchaseController::class, 'store'])->name('purchases.store');
+
 });
 
 // ৩. শুধু 'Warehouse' রোল স্টক এবং প্যাকিং ম্যানেজ করবে
