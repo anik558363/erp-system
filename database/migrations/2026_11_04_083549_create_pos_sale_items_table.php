@@ -9,7 +9,7 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+ public function up(): void
 {
     Schema::create('pos_sale_items', function (Blueprint $table) {
         $table->id();
@@ -17,7 +17,7 @@ return new class extends Migration
         $table->foreignId('product_id')->constrained('products');
         $table->integer('quantity');
         $table->decimal('unit_price', 12, 2);
-        $table->decimal('cost_price', 12, 2); // Profit report er jonno
+        $table->decimal('cost_price', 12, 2);
         $table->decimal('discount_amount', 12, 2)->default(0);
         $table->decimal('line_total', 14, 2);
         $table->integer('returned_qty')->default(0);

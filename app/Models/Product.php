@@ -28,4 +28,16 @@ class Product extends Model
     {
         return $this->hasMany(OrderItem::class);
     }
+
+    // app/Models/Product.php er vitore ei relation-gulo add kore din:
+
+public function posSaleItems()
+{
+    return $this->hasMany(PosSaleItem::class, 'product_id');
+}
+
+public function posReturns()
+{
+    return $this->hasMany(PosReturn::class, 'product_id');
+}
 }
