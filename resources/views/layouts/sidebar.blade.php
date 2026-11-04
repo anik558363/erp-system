@@ -78,9 +78,19 @@
                     </li>
 
                     <li class="nav-item">
-                        <a href="#" class="nav-link"><i data-lucide="shopping-bag"
-                                class="icon-sm me-2"></i>Purchase</a>
+                        <a href="{{ route('purchases.index') }}"
+                            class="nav-link {{ request()->routeIs('purchases.*') ? 'active' : '' }}">
+                            <i data-lucide="shopping-bag" class="icon-sm me-2"></i>Purchase
+                        </a>
                     </li>
+
+                    <li class="nav-item">
+                        <a href="{{ route('suppliers.index') }}"
+                            class="nav-link {{ request()->routeIs('suppliers.*') ? 'active' : '' }}">
+                            <i data-lucide="truck" class="icon-sm me-2"></i>Suppliers
+                        </a>
+                    </li>
+
                     <li class="nav-item">
                         <a href="stock.html" class="nav-link"><i data-lucide="boxes" class="icon-sm me-2"></i>Stock</a>
                     </li>
@@ -110,7 +120,7 @@
                     </li>
                     <li class="nav-item">
                         <a href="{{ route('expenses.index') }}" class="nav-link"><i data-lucide="receipt"
-                                class="icon-sm me-2"></i>Expenses (খরচ)</a>
+                                class="icon-sm me-2"></i>Expenses</a>
                     </li>
                     <li class="nav-item">
                         <a href="{{ route('reports.index') }}" class="nav-link"><i data-lucide="bar-chart-2"
