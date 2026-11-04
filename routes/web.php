@@ -3,7 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
-// অতিরিক্ত কন্ট্রোলারগুলো ইম্পোর্ট করে নিন (যেগুলো আপনার প্রজেক্টে লাগবে)
+// অতিরিক্ত কন্ট্রোলারগুলো ইম্পোর্ট করা হলো
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\OrderController;
@@ -12,14 +12,15 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\StockController;
 
+// ১. রুট ইউআরএল ('/') ওপেন করলে সরাসরি লগইন পেজে রিডাইরেক্ট করবে
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('login');
 });
 
-// ডিফল্ট ড্যাশবোর্ড (লগইন এবং ভেরিফাইড ইউজারদের জন্য)
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+// ডিফল্ট ড্যাশবোর্ড (লগইন এবং ভেরিফাইড ইউজারদের জন্য - যা কন্ট্রোলারের মাধ্যমে রোল অনুযায়ী ড্যাশবোর্ড দেখাবে)
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified', 'status']) // 'status' ekhane add kora holo
+    ->name('dashboard');
 
 // প্রোফাইল ম্যানেজমেন্ট রাউট
 Route::middleware('auth')->group(function () {
