@@ -36,7 +36,7 @@
                 <!-- ১. সবার জন্য কমন ড্যাশবোর্ড -->
                 <li class="nav-item">
                     <a href="{{ route('dashboard') }}"
-                        class="nav-link  d-flex align-items-center justify-content-between">
+                        class="nav-link d-flex align-items-center justify-content-between {{ request()->routeIs('dashboard') ? 'active' : '' }}">
                         <span><i data-lucide="layout-dashboard" class="icon-sm me-2"></i>Dashboard</span>
                     </a>
                 </li>
@@ -44,9 +44,9 @@
                 <!-- ২. OWNER এবং OFFICE রোলের জন্য মেনু -->
                 @role('Owner|Office')
                     <li class="nav-item">
-                        <a href="#" class="nav-link d-flex align-items-center justify-content-between">
-                            <span><i data-lucide="package" class="icon-sm me-2"></i>Products</span>
-                            <span class="badge rounded-pill bg-warning text-dark">2</span>
+                        <a href="{{ route('products.index') }}"
+                            class="nav-link {{ request()->routeIs('products.*') ? 'active' : '' }}">
+                            <i data-lucide="package" class="icon-sm me-2"></i>Products
                         </a>
                     </li>
                     <li class="nav-item">

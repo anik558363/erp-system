@@ -14,8 +14,6 @@
                     outstanding balances.</p>
             </div>
             <div>
-
-
                 <button type="button"
                     class="btn btn-emerald text-white fw-semibold px-3 py-2 shadow-xs d-inline-flex align-items-center gap-2"
                     style="background-color: #059669 !important; font-size: 13px;" data-bs-toggle="modal"
