@@ -28,4 +28,11 @@ class Customer extends Model
     {
         return $this->hasMany(LedgerEntry::class);
     }
+
+    // app/Models/Customer.php er vitore ei relation-ti add kore din:
+
+public function posSales()
+{
+    return $this->hasMany(PosSale::class, 'customer_id');
+}
 }
