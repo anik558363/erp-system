@@ -36,7 +36,7 @@
                 <!-- ১. সবার জন্য কমন ড্যাশবোর্ড -->
                 <li class="nav-item">
                     <a href="{{ route('dashboard') }}"
-                        class="nav-link active d-flex align-items-center justify-content-between">
+                        class="nav-link  d-flex align-items-center justify-content-between">
                         <span><i data-lucide="layout-dashboard" class="icon-sm me-2"></i>Dashboard</span>
                     </a>
                 </li>
@@ -50,13 +50,18 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a href="{{ route('categories.index') }}"
+                            class="nav-link {{ request()->routeIs('categories.*') ? 'active' : '' }}">
+                            <i data-lucide="layers" class="icon-sm me-2"></i>Categories
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a href="#" class="nav-link"><i data-lucide="shopping-bag"
                                 class="icon-sm me-2"></i>Purchase</a>
                     </li>
-                      <li class="nav-item">
-                            <a href="stock.html" class="nav-link"><i data-lucide="boxes"
-                                    class="icon-sm me-2"></i>Stock</a>
-                        </li>
+                    <li class="nav-item">
+                        <a href="stock.html" class="nav-link"><i data-lucide="boxes" class="icon-sm me-2"></i>Stock</a>
+                    </li>
                     <li class="nav-item">
                         <a href="#" class="nav-link"><i data-lucide="users" class="icon-sm me-2"></i>Customers</a>
                     </li>
@@ -69,10 +74,10 @@
                             <span class="badge rounded-pill bg-warning text-dark">1</span>
                         </a>
                     </li>
-                      <li class="nav-item">
-                            <a href="delivery.html" class="nav-link"><i data-lucide="truck"
-                                    class="icon-sm me-2"></i>Delivery</a>
-                        </li>
+                    <li class="nav-item">
+                        <a href="delivery.html" class="nav-link"><i data-lucide="truck"
+                                class="icon-sm me-2"></i>Delivery</a>
+                    </li>
                     <li class="nav-item">
                         <a href="#" class="nav-link"><i data-lucide="rotate-ccw" class="icon-sm me-2"></i>Returns</a>
                     </li>
@@ -116,7 +121,8 @@
                 <!-- ৫. SALESMAN রোলের জন্য মেনু -->
                 @role('Salesman')
                     <li class="nav-item">
-                        <a href="#" class="nav-link"><i data-lucide="shopping-bag" class="icon-sm me-2"></i>My Orders
+                        <a href="#" class="nav-link"><i data-lucide="shopping-bag" class="icon-sm me-2"></i>My
+                            Orders
                             & Sales</a>
                     </li>
                 @endrole

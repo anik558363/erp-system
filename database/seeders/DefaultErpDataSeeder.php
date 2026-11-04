@@ -5,17 +5,17 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\DB;
 
 class DefaultErpDataSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. Default Users with Roles
+        // 1. Default Users with Roles & Active Status
         $owner = User::firstOrCreate(
             ['email' => 'owner@erp.com'],
             [
                 'name' => 'System Owner',
+                'status' => 'active', // স্ট্যাটাস একটিভ করা হলো
                 'password' => Hash::make('password123'),
             ]
         );
@@ -25,6 +25,7 @@ class DefaultErpDataSeeder extends Seeder
             ['email' => 'office@erp.com'],
             [
                 'name' => 'Office Staff',
+                'status' => 'active',
                 'password' => Hash::make('password123'),
             ]
         );
@@ -34,6 +35,7 @@ class DefaultErpDataSeeder extends Seeder
             ['email' => 'sales@erp.com'],
             [
                 'name' => 'Salesman Rahim',
+                'status' => 'active',
                 'password' => Hash::make('password123'),
             ]
         );
@@ -43,6 +45,7 @@ class DefaultErpDataSeeder extends Seeder
             ['email' => 'warehouse@erp.com'],
             [
                 'name' => 'Warehouse Manager',
+                'status' => 'active',
                 'password' => Hash::make('password123'),
             ]
         );
@@ -52,10 +55,10 @@ class DefaultErpDataSeeder extends Seeder
             ['email' => 'delivery@erp.com'],
             [
                 'name' => 'Delivery Man Karim',
+                'status' => 'active',
                 'password' => Hash::make('password123'),
             ]
         );
         $delivery->assignRole('Delivery');
-        
     }
 }
