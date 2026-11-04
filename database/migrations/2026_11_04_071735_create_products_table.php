@@ -9,11 +9,12 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-   public function up(): void
+public function up(): void
 {
     Schema::create('products', function (Blueprint $table) {
         $table->id();
         $table->string('sku')->unique();
+        $table->string('barcode')->unique()->nullable(); // POS Scanner er jonno
         $table->string('name');
         $table->foreignId('category_id')->constrained('categories')->onDelete('cascade');
         $table->foreignId('brand_id')->constrained('brands')->onDelete('cascade');
@@ -23,11 +24,11 @@ return new class extends Migration
         $table->decimal('mrp', 12, 2);
         $table->integer('min_stock')->default(0);
         $table->string('image')->nullable();
-        $table->string('status')->default('ACTIVE'); // ACTIVE / INACTIVE
+        $table->string('status')->default('ACTIVE');
         $table->timestamps();
 
-        // Indexes for performance
         $table->index('name');
+        $table->index('barcode');
         $table->index('category_id');
         $table->index('brand_id');
         $table->index('status');
