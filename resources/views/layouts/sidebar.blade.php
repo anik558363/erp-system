@@ -55,6 +55,28 @@
                             <i data-lucide="layers" class="icon-sm me-2"></i>Categories
                         </a>
                     </li>
+
+                    <li class="nav-item">
+                        <a href="{{ route('areas.index') }}"
+                            class="nav-link {{ request()->routeIs('areas.*') ? 'active' : '' }}">
+                            <i data-lucide="map-pin" class="icon-sm me-2"></i>Areas
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="{{ route('brands.index') }}"
+                            class="nav-link {{ request()->routeIs('brands.*') ? 'active' : '' }}">
+                            <i data-lucide="tag" class="icon-sm me-2"></i>Brands
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="{{ route('customers.index') }}"
+                            class="nav-link {{ request()->routeIs('customers.*') ? 'active' : '' }}">
+                            <i data-lucide="users" class="icon-sm me-2"></i>Customers
+                        </a>
+                    </li>
+
                     <li class="nav-item">
                         <a href="#" class="nav-link"><i data-lucide="shopping-bag"
                                 class="icon-sm me-2"></i>Purchase</a>
@@ -62,9 +84,7 @@
                     <li class="nav-item">
                         <a href="stock.html" class="nav-link"><i data-lucide="boxes" class="icon-sm me-2"></i>Stock</a>
                     </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link"><i data-lucide="users" class="icon-sm me-2"></i>Customers</a>
-                    </li>
+
                     <li class="nav-item">
                         <a href="#" class="nav-link"><i data-lucide="user-check" class="icon-sm me-2"></i>Salesmen</a>
                     </li>
@@ -105,7 +125,8 @@
                                 class="icon-sm me-2"></i>Stock Management</a>
                     </li>
                     <li class="nav-item">
-                        <a href="#" class="nav-link"><i data-lucide="clipboard-list" class="icon-sm me-2"></i>Packing
+                        <a href="#" class="nav-link"><i data-lucide="clipboard-list"
+                                class="icon-sm me-2"></i>Packing
                             Orders</a>
                     </li>
                 @endrole
