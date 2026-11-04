@@ -1,0 +1,577 @@
+:root {
+    --slate-900: #0f172a;
+    --slate-800: #1e293b;
+    --emerald: #10b981;
+    --emerald-subtle: #d1fae5;
+    --purple: #7c3aed;
+    --bs-emerald: #10b981;
+    --bs-purple: #8b5cf6;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f8fafc;
+    color: #334155;
+    overflow-x: hidden;
+    margin: 0;
+    padding: 0;
+}
+
+.font-mono {
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.bg-slate-900 {
+    background-color: var(--slate-900);
+}
+
+.bg-slate-800 {
+    background-color: var(--slate-800);
+}
+
+.bg-emerald {
+    background-color: var(--emerald);
+}
+
+.bg-emerald-subtle {
+    background-color: var(--emerald-subtle);
+}
+
+.text-emerald {
+    color: var(--emerald) !important;
+}
+
+.text-purple {
+    color: var(--purple) !important;
+}
+
+.shadow-xs {
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.icon-xs {
+    width: 14px;
+    height: 14px;
+}
+
+.icon-sm {
+    width: 16px;
+    height: 16px;
+}
+
+.status-dot {
+    width: 7px;
+    height: 7px;
+    background-color: var(--emerald);
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.top-header {
+    height: 56px;
+    z-index: 1030;
+    width: 100%;
+}
+
+.app-wrapper {
+    display: flex;
+    width: 100%;
+    min-height: calc(100vh - 56px);
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Sidebar default for Desktop */
+.sidebar {
+    width: 280px;
+    min-height: 100%;
+    flex-shrink: 0;
+    transition: transform 0.3s ease-in-out;
+    z-index: 1025;
+}
+
+.brand-badge {
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
+}
+
+.sidebar-nav .nav-link {
+    color: #94a3b8;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+}
+
+.sidebar-nav .nav-link:hover {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.06);
+}
+
+.sidebar-nav .nav-link.active {
+    color: #ffffff;
+    background-color: var(--emerald);
+    font-weight: 600;
+}
+
+.section-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #64748b;
+    letter-spacing: 0.5px;
+}
+
+.ops-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 12px;
+}
+
+.perf-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+}
+
+.main-content {
+    flex-grow: 1;
+    width: 100%;
+    min-width: 0;
+    overflow-x: hidden;
+}
+
+.custom-table th {
+    font-size: 11px;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    padding: 10px 12px;
+    border-bottom: 1px solid #e2e8f0;
+    white-space: nowrap;
+}
+
+.custom-table td {
+    font-size: 13px;
+    padding: 12px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+/* ==========================================
+   MOBILE & TABLET RESPONSIVE FIXES
+   ========================================== */
+
+@media (max-width: 1400px) {
+    .ops-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+@media (max-width: 991.98px) {
+    .sidebar {
+        position: fixed;
+        top: 56px;
+        left: 0;
+        bottom: 0;
+        width: 240px;
+        transform: translateX(-100%);
+        background-color: var(--slate-900);
+        box-shadow: 4px 0 15px rgba(0, 0, 0, 0.2);
+        z-index: 1040;
+    }
+
+    .sidebar.show {
+        transform: translateX(0);
+    }
+
+    .sidebar-backdrop {
+        position: fixed;
+        inset: 56px 0 0 0;
+        background: rgba(15, 23, 42, 0.5);
+        z-index: 1035;
+        display: none;
+    }
+
+    .sidebar-backdrop.show {
+        display: block;
+    }
+
+    .ops-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .perf-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 767.98px) {
+    .ops-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+
+    .perf-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .top-header {
+        padding-left: 8px !important;
+        padding-right: 8px !important;
+    }
+
+    .main-content {
+        padding: 10px !important;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .ops-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .perf-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .container-fluid {
+        padding-left: 4px !important;
+        padding-right: 4px !important;
+    }
+
+    .card-body {
+        padding: 10px !important;
+    }
+}
+
+
+
+/* Horizontal Scrollable Category Tabs for Mobile/Desktop Overflow */
+.category-scroll-container {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 6px;
+    padding-bottom: 4px;
+    scrollbar-width: thin;
+}
+
+.category-scroll-container::-webkit-scrollbar {
+    height: 4px;
+}
+
+.category-scroll-container::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 4px;
+}
+
+.category-scroll-container .btn {
+    flex: 0 0 auto;
+    /* Prevents buttons from shrinking */
+    white-space: nowrap;
+}
+
+/* Custom Emerald Button & Hover Fix */
+.btn-emerald {
+    background-color: #10b981 !important;
+    border-color: #10b981 !important;
+    color: #ffffff !important;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-emerald:hover,
+.btn-emerald:focus {
+    background-color: #059669 !important;
+    border-color: #059669 !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+}
+
+
+/* Product Card Image Full Width & Height Cover Fix */
+.product-img-wrap {
+    height: 180px;
+    /* Adjust height if needed */
+    overflow: hidden;
+    background-color: #f8fafc;
+}
+
+.product-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* Eta image ke stretch na kore pura container fill korbe */
+}
+
+
+.purchase-status-filter button {
+    font-size: 12px !important;
+}
+
+.order-status-filters button {
+    font-size: 12px !important;
+}
+
+.return-type-filters button {
+    font-size: 12px !important;
+}
+
+.payment-filters-section button {
+    font-size: 12px !important;
+}
+
+
+.category-scroll-container button {
+    font-size: 12px;
+}
+
+/* Standard & Compact Modal Styling */
+.modal-dialog {
+    max-width: 650px !important;
+    /* Modal er width control korar jonno */
+    margin: 1.75rem auto;
+}
+
+.modal-body {
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+    /* Jodi content beshi hoy tahole vitore scroll hobe, modal boro hobe na */
+    padding: 1.25rem !important;
+}
+
+.modal-header {
+    padding: 0.75rem 1.25rem !important;
+}
+
+.modal-footer {
+    padding: 0.75rem 1.25rem !important;
+}
+
+.modal-body .form-control-sm,
+.modal-body .form-select-sm {
+    padding: 0.35rem 0.5rem;
+    font-size: 12px;
+}
+
+
+/* Standard & Compact Modal Styling */
+.modal-dialog {
+    max-width: 650px !important;
+    /* Modal er width control korar jonno */
+    margin: 1.75rem auto;
+}
+
+.modal-body {
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+    /* Jodi content beshi hoy tahole vitore scroll hobe, modal boro hobe na */
+    padding: 1.25rem !important;
+}
+
+.modal-header {
+    padding: 0.75rem 1.25rem !important;
+}
+
+.modal-footer {
+    padding: 0.75rem 1.25rem !important;
+}
+
+.modal-body .form-control-sm,
+.modal-body .form-select-sm {
+    padding: 0.35rem 0.5rem;
+    font-size: 12px;
+}
+
+
+
+/* Standard & Compact Modal Styling Fix */
+.modal-dialog {
+    max-width: 900px !important;
+    /* Standard width for large purchase modal */
+    margin: 1.5rem auto;
+}
+
+.modal-content {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.modal-body {
+    max-height: calc(100vh - 180px);
+    overflow-y: auto;
+    padding: 1.25rem !important;
+}
+
+.modal-header {
+    padding: 0.75rem 1.25rem !important;
+}
+
+.modal-footer {
+    padding: 0.75rem 1.25rem !important;
+}
+
+.modal-body .form-control-sm,
+.modal-body .form-select-sm {
+    padding: 0.35rem 0.5rem;
+    font-size: 12px;
+}
+
+
+/* Center & Enlarge Success Message Inside Modal */
+#orderSuccessAlert {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 260px;
+    /* background-color: #f0fdf4 !important;
+    border: 1px solid #bbf7d0 !important; */
+    border-radius: 8px;
+    margin: 10px 0;
+}
+
+
+.bg-purple {
+    background-color: #8b5cf6 !important;
+}
+
+.text-purple {
+    color: #8b5cf6 !important;
+}
+
+
+/* ==========================================
+   PRINT STYLING FIX FOR INVOICE MODAL
+   ========================================== */
+@media print {
+
+    /* Hide everything on body by default */
+    body * {
+        visibility: hidden;
+    }
+
+    /* Only show the cash memo modal content */
+    #cashMemoModal,
+    #cashMemoModal * {
+        visibility: visible;
+    }
+
+    #cashMemoModal {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        background: white !important;
+    }
+
+    /* Hide close and print buttons inside print view */
+    .modal-header .btn-close,
+    .modal-header .btn-success {
+        display: none !important;
+    }
+
+    .modal-title {
+        display: none !important;
+    }
+}
+
+
+/* Fix button text disappearance on hover */
+.btn-outline-secondary:hover {
+    background-color: #64748b !important;
+    border-color: #64748b !important;
+    color: #ffffff !important;
+}
+
+.btn-dark:hover {
+    background-color: #1e293b !important;
+    border-color: #1e293b !important;
+    color: #ffffff !important;
+}
+
+
+@media print {
+
+    /* Hide all dashboard layout elements */
+    body * {
+        visibility: hidden;
+    }
+
+    /* Only show the statement card container */
+    .card:has(.table-responsive),
+    .card:has(.table-responsive) * {
+        visibility: visible;
+    }
+
+    .card:has(.table-responsive) {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        border: none !important;
+        box-shadow: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* Hide action buttons and sidebar inside print view */
+    .sidebar,
+    .top-header,
+    .btn,
+    .card:not(:has(.table-responsive)) {
+        display: none !important;
+    }
+}
+
+
+
+@media print {
+    body * {
+        visibility: hidden;
+    }
+
+    #printableStatement,
+    #printableStatement * {
+        visibility: visible;
+    }
+
+    #printableStatement {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        padding: 10px;
+        background: white !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+
+    .no-print {
+        display: none !important;
+    }
+
+    /* Prevent unwanted page breaks */
+    table,
+    tr,
+    td,
+    th,
+    .row {
+        page-break-inside: avoid;
+    }
+}
