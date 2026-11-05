@@ -96,9 +96,10 @@
                         <i data-lucide="credit-card" class="icon-sm me-2"></i> Supplier Payments
                     </a>
 
-                    <li class="nav-item">
-                        <a href="stock.html" class="nav-link"><i data-lucide="boxes" class="icon-sm me-2"></i>Stock</a>
-                    </li>
+                    <a href="{{ route('stock.index') }}"
+                        class="nav-link {{ request()->routeIs('stock.*') ? 'active' : '' }}">
+                        <i data-lucide="box" class="icon-sm me-2"></i> Stock Inventory
+                    </a>
 
                     <li class="nav-item">
                         <a href="#" class="nav-link"><i data-lucide="user-check" class="icon-sm me-2"></i>Salesmen</a>

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Stock extends Model
 {
     protected $guarded = [];
-    public $timestamps = false; // Karon migration-e timestamp-er jaygay nullable updated_at chilo
+    public $timestamps = false;
 
     public function product()
     {

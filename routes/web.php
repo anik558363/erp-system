@@ -98,6 +98,10 @@ Route::middleware(['auth', 'role:Owner|Office'])->group(function () {
     Route::get('/supplier-payments', [SupplierPaymentController::class, 'index'])->name('supplier.payments.index');
     Route::post('/supplier-payments', [SupplierPaymentController::class, 'store'])->name('supplier.payments.store');
 
+    // Stock Management Route
+    Route::get('/stock', [StockController::class, 'index'])->name('stock.index');
+    Route::post('/stock/adjust', [StockController::class, 'adjustStock'])->name('stock.adjust');
+
 });
 
 // ৩. শুধু 'Warehouse' রোল স্টক এবং প্যাকিং ম্যানেজ করবে
