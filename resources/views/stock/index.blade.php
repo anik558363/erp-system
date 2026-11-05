@@ -129,15 +129,15 @@
                                 </td>
                                 <td class="text-center font-mono fw-bold text-dark">
                                     {{ number_format($stock->physical_qty ?? 0) }}</td>
-                               
+
                                 <td class="text-center font-mono text-success fw-bold">
                                     {{ number_format(($stock->physical_qty ?? 0) - ($stock->reserved_qty ?? 0)) }}</td>
                                 <td class="text-center font-mono text-danger fw-semibold">
                                     {{ number_format($stock->damaged_qty ?? 0) }}</td>
-                                <td class="text-center font-mono text-muted">{{ $stock->product->min_threshold ?? 10 }}
+                                <td class="text-center font-mono text-muted">{{ $stock->product->min_stock ?? 10 }}
                                 </td>
                                 <td class="px-3 text-end">
-                                    @if (($stock->physical_qty ?? 0) <= ($stock->product->min_threshold ?? 10))
+                                    @if (($stock->physical_qty ?? 0) <= ($stock->product->min_stock ?? 10))
                                         <span
                                             class="badge bg-warning-subtle text-warning border border-warning-subtle font-mono px-2 py-1"
                                             style="font-size: 10px;">LOW STOCK</span>

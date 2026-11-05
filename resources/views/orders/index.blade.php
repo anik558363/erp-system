@@ -18,20 +18,20 @@
                 class="btn btn-success btn-sm px-3 shadow-xs d-flex align-items-center gap-1 fw-bold text-white"
                 style="background-color: #059669; border-color: #059669;" data-bs-toggle="modal"
                 data-bs-target="#fastOrderModal" onclick="resetOrderModal()">
-                <i data-lucide="plus-circle" class="icon-xs"></i> + Create New Order
+                <i data-lucide="plus-circle" class="icon-xs"></i> Create New Order
             </button>
         </div>
     </div>
 
     <!-- Success & Error Alert Messages -->
-    @if(session('success'))
+    @if (session('success'))
         <div class="alert alert-success alert-dismissible fade show shadow-xs mb-4" role="alert" style="font-size: 13px;">
             <i data-lucide="check-circle" class="icon-xs me-1"></i> {{ session('success') }}
             <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
 
-    @if($errors->any())
+    @if ($errors->any())
         <div class="alert alert-danger alert-dismissible fade show shadow-xs mb-4" role="alert" style="font-size: 13px;">
             <i data-lucide="alert-circle" class="icon-xs me-1"></i> {{ $errors->first() }}
             <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -42,7 +42,7 @@
     <div class="card border-0 shadow-sm rounded-3 mb-4 bg-white">
         <div class="card-body p-3">
             <form action="{{ route('orders.index') }}" method="GET">
-                <div class="row mb-3">
+                <div class="row mb-0">
                     <div class="col-md-4">
                         <div class="input-group input-group-sm">
                             <span class="input-group-text bg-light border-end-0 text-muted"><i data-lucide="search"
@@ -69,6 +69,7 @@
                             <th class="py-3">Customer & Mobile</th>
                             <th class="py-3">Area</th>
                             <th class="py-3">Salesman</th>
+                            <th class="py-3">Items Summary</th>
                             <th class="py-3 text-end">Order Amount</th>
                             <th class="py-3 text-center">Status</th>
                             <th class="py-3 px-3 text-end">Action</th>
@@ -80,27 +81,54 @@
                                 <td class="px-3 font-mono fw-bold text-dark small">{{ $order->order_no }}</td>
                                 <td class="font-mono text-muted small">{{ $order->order_date }}</td>
                                 <td>
-                                    <div class="fw-bold text-dark small">{{ $order->customer->proprietor_name ?? 'N/A' }}</div>
+                                    <div class="fw-bold text-dark small">
+                                        {{ $order->customer->proprietor_name ?? ($order->customer->name ?? 'N/A') }}</div>
                                     <small class="text-muted font-mono"
                                         style="font-size: 10px;">{{ $order->customer->phone ?? '' }}</small>
                                 </td>
                                 <td><span class="badge bg-light text-secondary border font-mono"
                                         style="font-size: 9px;">{{ $order->area->name ?? 'General' }}</span></td>
                                 <td><span class="text-secondary small">{{ $order->salesman->name ?? 'N/A' }}</span></td>
+                                <td class="px-3">
+                                    @if ($order->items && $order->items->count() > 0)
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="badge bg-light text-dark border font-mono"
+                                                style="font-size: 10px;">{{ $order->items->count() }} Items</span>
+
+                                        </div>
+                                    @else
+                                        <span class="text-muted small">No items</span>
+                                    @endif
+                                </td>
                                 <td class="text-end font-mono fw-bold text-dark">
                                     ৳{{ number_format($order->total_amount, 2) }}</td>
                                 <td class="text-center">
-                                    <span class="badge bg-warning-subtle text-warning border font-mono px-2 py-1"
-                                        style="font-size: 10px;">{{ $order->status }}</span>
+                                    @php
+                                        $statusClass = match ($order->status) {
+                                            'APPROVED' => 'bg-success-subtle text-success border-success',
+                                            'PENDING_APPROVAL' => 'bg-warning-subtle text-warning border-warning',
+                                            'PACKED' => 'bg-info-subtle text-info border-info',
+                                            'DISPATCHED' => 'bg-primary-subtle text-primary border-primary',
+                                            'DELIVERED' => 'bg-teal-subtle text-success border-teal',
+                                            'REJECTED' => 'bg-danger-subtle text-danger border-danger',
+                                            default => 'bg-secondary-subtle text-secondary border-secondary',
+                                        };
+                                    @endphp
+                                    <span class="badge {{ $statusClass }} font-mono px-2 py-1 border"
+                                        style="font-size: 10px;">
+                                        {{ $order->status }}
+                                    </span>
                                 </td>
                                 <td class="px-3 text-end">
-                                    <a href="{{ route('orders.show', $order->id) }}"
-                                        class="btn btn-outline-secondary btn-sm px-2 py-1">View</a>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm px-2 py-1"
+                                        onclick="openOrderDetailsModal({{ json_encode($order) }})">
+                                        View
+                                    </button>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="8" class="text-center text-muted py-5 small font-mono">কোনো অর্ডার পাওয়া
+                                <td colspan="9" class="text-center text-muted py-5 small font-mono">কোনো অর্ডার পাওয়া
                                     যায়নি।</td>
                             </tr>
                         @endforelse
@@ -110,10 +138,11 @@
         </div>
 
         <!-- Pagination Links Section -->
-        @if(isset($orders) && method_exists($orders, 'hasPages') && $orders->hasPages())
+        @if (isset($orders) && method_exists($orders, 'hasPages') && $orders->hasPages())
             <div class="card-footer bg-white py-3 px-3 d-flex justify-content-between align-items-center">
                 <div class="text-muted small font-mono">
-                    Showing {{ $orders->firstItem() ?? 0 }} to {{ $orders->lastItem() ?? 0 }} of {{ $orders->total() ?? 0 }} entries
+                    Showing {{ $orders->firstItem() ?? 0 }} to {{ $orders->lastItem() ?? 0 }} of
+                    {{ $orders->total() ?? 0 }} entries
                 </div>
                 <div>
                     {{ $orders->appends(request()->query())->links() }}
@@ -122,9 +151,89 @@
         @endif
     </div>
 
-    <!-- ==========================================
-            3-STEP MULTI-STEP ORDER MODAL FLOW
-            ========================================== -->
+    <!-- ORDER DETAILS & APPROVAL MODAL -->
+    <div class="modal fade" id="orderDetailsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-md">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-dark text-white py-2 px-3">
+                    <h6 class="modal-title fw-bold fs-6">ORDER DETAILS & APPROVAL</h6>
+                    <button type="button" class="btn-close btn-close-white shadow-none" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4 small">
+                    <div class="mb-3 pb-2 border-bottom">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-muted">Order No:</span>
+                            <strong class="font-mono text-dark" id="modalOrderNo">-</strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-muted">Order Date:</span>
+                            <span class="font-mono" id="modalOrderDate">-</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-muted">Status:</span>
+                            <span id="modalOrderStatus" class="badge bg-warning font-mono">-</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 pb-2 border-bottom">
+                        <span class="text-muted d-block mb-1 fw-bold">CUSTOMER & AREA INFO:</span>
+                        <div class="fw-bold text-dark" id="modalCustName">-</div>
+                        <div class="text-muted">Shop: <span id="modalCustShop" class="text-dark fw-semibold">-</span>
+                        </div>
+                        <div class="text-muted">Phone: <span id="modalCustPhone" class="font-mono text-dark">-</span>
+                        </div>
+                        <div class="text-muted">Area: <span id="modalCustArea"
+                                class="badge bg-light text-secondary border font-mono">-</span></div>
+                    </div>
+
+                    <div class="mb-3">
+                        <span class="text-muted d-block mb-1 fw-bold">ORDERED ITEMS:</span>
+                        <div class="border rounded bg-light p-2 font-mono" id="modalItemsList"
+                            style="max-height: 160px; overflow-y: auto; font-size: 11px;">
+                            <!-- Dynamic Items -->
+                        </div>
+                    </div>
+
+                    <div
+                        class="d-flex justify-content-between align-items-center bg-white p-2 border rounded font-mono mb-3">
+                        <span class="fw-bold text-dark">Total Amount:</span>
+                        <strong class="text-success fs-6" id="modalTotalAmount">৳0.00</strong>
+                    </div>
+
+                    <!-- APPROVAL & STATUS UPDATE FORM -->
+                    <form id="orderApprovalForm" method="POST">
+                        @csrf
+                        @method('PATCH')
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Update Order Status / Workflow:</label>
+                            <select name="status" id="modalStatusSelect"
+                                class="form-select form-select-sm shadow-none font-mono">
+                                <option value="PENDING_APPROVAL">PENDING_APPROVAL</option>
+                                <option value="APPROVED">APPROVED (Deduct Stock)</option>
+                                <option value="PACKED">PACKED</option>
+                                <option value="DISPATCHED">DISPATCHED</option>
+                                <option value="DELIVERED">DELIVERED</option>
+                                <option value="REJECTED">REJECTED</option>
+                            </select>
+                        </div>
+                        <div class="d-flex justify-content-end gap-2">
+                            <button type="button" class="btn btn-secondary btn-sm px-3"
+                                data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-outline-dark btn-sm px-3 font-mono"
+                                onclick="printOrderInvoice()">
+                                <i data-lucide="printer" class="icon-xs me-1"></i> Print Invoice
+                            </button>
+                            <button type="submit" class="btn btn-success btn-sm px-4 fw-bold"
+                                style="background-color: #059669;">Update Status</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3-STEP MULTI-STEP ORDER MODAL FLOW -->
     <div class="modal fade" id="fastOrderModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content border-0 shadow-lg">
@@ -147,7 +256,6 @@
                     </div>
 
                     <div class="modal-body p-4" style="min-height: 320px;">
-
                         <!-- STEP 1: SELECT CUSTOMER -->
                         <div id="modalStep1" class="order-step-content">
                             <h6 class="fw-bold text-dark mb-3">STEP 1: SELECT B2B CUSTOMER</h6>
@@ -189,12 +297,9 @@
                                     <input type="text" id="productSearchInput"
                                         class="form-control form-control-sm shadow-none"
                                         placeholder="Type product name or SKU to search..." autocomplete="off">
-
-                                    <!-- Custom Suggestions Dropdown Box -->
                                     <div id="productSuggestionsList" class="dropdown-menu w-100 shadow border bg-white"
                                         style="max-height: 200px; overflow-y: auto; display: none; position: absolute; z-index: 1050;">
                                     </div>
-
                                     <input type="hidden" id="selectedProductId">
                                     <input type="hidden" id="selectedProductName">
                                     <input type="hidden" id="selectedProductSku">
@@ -206,7 +311,6 @@
                                 </div>
                             </div>
 
-                            <!-- Dynamic Selected Products Table -->
                             <div class="table-responsive border rounded bg-white"
                                 style="max-height: 200px; overflow-y: auto;">
                                 <table class="table table-sm align-middle mb-0" style="font-size: 11px;">
@@ -238,7 +342,6 @@
                         <!-- STEP 3: CONFIRM & REVIEW -->
                         <div id="modalStep3" class="order-step-content d-none">
                             <h6 class="fw-bold text-dark mb-3">STEP 3: REVIEW & CONFIRM ORDER</h6>
-
                             <div class="p-3 bg-light rounded border mb-3 small">
                                 <div class="mb-2 pb-2 border-bottom">
                                     <span class="text-muted d-block mb-1" style="font-size: 10px;">CUSTOMER
@@ -251,12 +354,10 @@
                                     <div class="text-muted" style="font-size: 11px;">Area: <span id="reviewCustomerArea"
                                             class="badge bg-light text-secondary border font-mono">-</span></div>
                                 </div>
-
                                 <div class="mb-2">
                                     <span class="text-muted d-block mb-1">Ordered Items Summary:</span>
                                     <div id="reviewItemsList" class="border rounded bg-white p-2 font-mono"
                                         style="max-height: 120px; overflow-y: auto; font-size: 10px;">
-                                        <!-- Dynamic items review -->
                                     </div>
                                 </div>
                                 <div class="d-flex justify-content-between border-top pt-2 mt-2">
@@ -264,14 +365,12 @@
                                     <strong id="reviewTotal" class="text-success font-mono fs-6">-</strong>
                                 </div>
                             </div>
-
                             <div class="mb-3">
                                 <label class="form-label small fw-bold">Remarks / Notes</label>
                                 <textarea name="note" class="form-control shadow-none" rows="2"
                                     placeholder="Optional delivery instructions..."></textarea>
                             </div>
                         </div>
-
                     </div>
 
                     <div class="modal-footer bg-light py-2 justify-content-between" id="modalFooterBtns">
@@ -292,7 +391,7 @@
         </div>
     </div>
 
-    <!-- JavaScript for Dynamic Multiple Products & Search Flow -->
+    <!-- JavaScript Section -->
     <script>
         let currentModalStep = 1;
         let addedProducts = [];
@@ -312,19 +411,18 @@
             updateModalView();
         }
 
-        // Product Catalog Array from PHP
         const productsData = [
             @foreach ($products ?? [] as $product)
                 {
                     id: "{{ $product->id }}",
                     name: "{{ $product->name }}",
                     sku: "{{ $product->sku }}",
-                    price: "{{ $product->wholesale_price ?? 0 }}"
+                    price: "{{ $product->wholesale_price ?? 0 }}",
+                    image: "{{ $product->image ? asset('storage/' . $product->image) : '' }}"
                 },
             @endforeach
         ];
 
-        // Real-time search filter for products
         document.getElementById('productSearchInput').addEventListener('input', function() {
             let keyword = this.value.toLowerCase().trim();
             let suggestionsList = document.getElementById('productSuggestionsList');
@@ -363,11 +461,10 @@
             } else {
                 suggestionsList.style.display = 'block';
                 suggestionsList.innerHTML =
-                    `<span class="dropdown-item small text-muted py-2 px-3">কোনো পণ্য পাওয়া যায়নি</span>`;
+                    `<span class="dropdown-item small text-muted py-2 px-3">কোনো পণ্য পাওয়া যায়নি</span>`;
             }
         });
 
-        // Hide suggestions when clicking outside
         document.addEventListener('click', function(e) {
             let searchInput = document.getElementById('productSearchInput');
             let suggestionsList = document.getElementById('productSuggestionsList');
@@ -389,7 +486,6 @@
                 return;
             }
 
-            // Check if already added
             let existing = addedProducts.find(p => p.id === prodId);
             if (existing) {
                 existing.qty += 1;
@@ -403,7 +499,6 @@
                 });
             }
 
-            // Clear search input fields
             searchInput.value = "";
             document.getElementById('selectedProductId').value = "";
             document.getElementById('selectedProductName').value = "";
@@ -490,7 +585,6 @@
                     return;
                 }
 
-                // Populate Review screen (Step 3) with Customer Details
                 let custSelect = document.getElementById('customerSelect');
                 let custOpt = custSelect.options[custSelect.selectedIndex];
 
@@ -562,5 +656,219 @@
                 submitBtn.classList.remove('d-none');
             }
         }
+
+        function openOrderDetailsModal(order) {
+            document.getElementById('modalOrderNo').innerText = order.order_no;
+            document.getElementById('modalOrderDate').innerText = order.order_date;
+            document.getElementById('modalOrderStatus').innerText = order.status;
+
+            document.getElementById('modalCustName').innerText = order.customer ? order.customer.name : 'N/A';
+            document.getElementById('modalCustShop').innerText = order.customer ? (order.customer.shop_name || order
+                .customer.name) : 'N/A';
+            document.getElementById('modalCustPhone').innerText = order.customer ? order.customer.phone : 'N/A';
+            document.getElementById('modalCustArea').innerText = order.area ? order.area.name : 'General';
+
+            document.getElementById('modalTotalAmount').innerText = '৳' + parseFloat(order.total_amount).toFixed(2);
+            document.getElementById('modalStatusSelect').value = order.status;
+            document.getElementById('orderApprovalForm').action = `/orders/${order.id}/status`;
+
+            let itemsList = document.getElementById('modalItemsList');
+            itemsList.innerHTML = '';
+
+            if (order.items && order.items.length > 0) {
+                order.items.forEach((item, index) => {
+                    let productName = item.product ? item.product.name : 'Product #' + item.product_id;
+
+                    // ডায়নামিক ইমেজ পাথ চেক করা (যদি ডেটাবেজে image ফিল্ড থাকে)
+                    let productImage = 'https://via.placeholder.com/40';
+                    if (item.product && item.product.image) {
+                        // যদি পাথে অলready http বা storage না থাকে, তবে সঠিক URL তৈরি করা
+                        if (item.product.image.startsWith('http')) {
+                            productImage = item.product.image;
+                        } else {
+                            productImage = `/storage/${item.product.image}`;
+                        }
+                    }
+
+                    let lineTotal = parseFloat(item.line_total || (item.quantity * item.unit_rate)).toFixed(2);
+
+                    itemsList.innerHTML += `
+                        <div class="d-flex align-items-center justify-content-between mb-2 border-bottom pb-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <img src="${productImage}" alt="Product" class="rounded border" style="width: 35px; height: 35px; object-fit: cover;" onerror="this.src='https://via.placeholder.com/40'">
+                                <div>
+                                    <div class="fw-bold text-dark">${index + 1}. ${productName}</div>
+                                    <small class="text-muted font-mono">Qty: ${item.quantity} × ৳${item.unit_rate}</small>
+                                </div>
+                            </div>
+                            <strong class="font-mono text-dark">৳${lineTotal}</strong>
+                        </div>
+                    `;
+                });
+            } else {
+                itemsList.innerHTML = '<div class="text-center text-muted">No items found</div>';
+            }
+
+            let myModal = new bootstrap.Modal(document.getElementById('orderDetailsModal'));
+            myModal.show();
+        }
+
+        function openOrderDetailsModal(order) {
+            document.getElementById('modalOrderNo').innerText = order.order_no;
+            document.getElementById('modalOrderDate').innerText = order.order_date;
+            document.getElementById('modalOrderStatus').innerText = order.status;
+
+            // Ayusin ang pagkuha ng pangalan ng customer upang maiwasan ang "undefined"
+            let customerName = 'N/A';
+            if (order.customer) {
+                customerName = order.customer.proprietor_name || order.customer.name || 'N/A';
+            }
+
+            document.getElementById('modalCustName').innerText = customerName;
+            document.getElementById('modalCustShop').innerText = order.customer ? (order.customer.shop_name || customerName) : 'N/A';
+            document.getElementById('modalCustPhone').innerText = order.customer ? (order.customer.phone || 'N/A') : 'N/A';
+            document.getElementById('modalCustArea').innerText = order.area ? order.area.name : 'General';
+
+            document.getElementById('modalTotalAmount').innerText = '৳' + parseFloat(order.total_amount).toFixed(2);
+            document.getElementById('modalStatusSelect').value = order.status;
+            document.getElementById('orderApprovalForm').action = `/orders/${order.id}/status`;
+
+            let itemsList = document.getElementById('modalItemsList');
+            itemsList.innerHTML = '';
+
+            if (order.items && order.items.length > 0) {
+                order.items.forEach((item, index) => {
+                    let productName = item.product ? item.product.name : 'Product #' + item.product_id;
+                    let productImage = (item.product && item.product.image) ? `/storage/${item.product.image}` : 'https://via.placeholder.com/40';
+                    let lineTotal = parseFloat(item.line_total || (item.quantity * item.unit_rate)).toFixed(2);
+
+                    itemsList.innerHTML += `
+                        <div class="d-flex align-items-center justify-content-between mb-2 border-bottom pb-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <img src="${productImage}" alt="Product" class="rounded border" style="width: 35px; height: 35px; object-fit: cover;">
+                                <div>
+                                    <div class="fw-bold text-dark">${index + 1}. ${productName}</div>
+                                    <small class="text-muted font-mono">Qty: ${item.quantity} × ৳${item.unit_rate}</small>
+                                </div>
+                            </div>
+                            <strong class="font-mono text-dark">৳${lineTotal}</strong>
+                        </div>
+                    `;
+                });
+            } else {
+                itemsList.innerHTML = '<div class="text-center text-muted">No items found</div>';
+            }
+
+            let myModal = new bootstrap.Modal(document.getElementById('orderDetailsModal'));
+            myModal.show();
+        }
+
+        function printOrderInvoice() {
+            let orderNo = document.getElementById('modalOrderNo').innerText;
+            let orderDate = document.getElementById('modalOrderDate').innerText;
+            let orderStatus = document.getElementById('modalOrderStatus').innerText;
+            let custName = document.getElementById('modalCustName').innerText;
+            let custShop = document.getElementById('modalCustShop').innerText;
+            let custPhone = document.getElementById('modalCustPhone').innerText;
+            let custArea = document.getElementById('modalCustArea').innerText;
+            let totalAmount = document.getElementById('modalTotalAmount').innerText;
+            let itemsHtmlContent = document.getElementById('modalItemsList').innerHTML;
+
+            let printWindow = window.open('', '_blank', 'width=900,height=700');
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Invoice - ${orderNo}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; font-size: 13px; color: #333; padding: 20px; margin: 0; background: #fff; }
+                        .invoice-container { max-width: 800px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+                        .header { text-align: center; margin-bottom: 20px; border-bottom: 1px solid #059669; padding-bottom: 10px; }
+                        .header h2 { margin: 0; color: #059669; font-size: 22px; }
+                        .header p { margin: 5px 0 0; color: #555; font-size: 11px; text-transform: uppercase; }
+
+                        .info-section { display: flex; justify-content: space-between; margin-bottom: 20px; background: #f8f9fa; padding: 12px; border-radius: 6px; }
+                        .info-box { width: 48%; }
+                        .info-box h4 { margin: 0 0 6px 0; font-size: 12px; color: #059669; text-transform: uppercase; border-bottom: 1px solid #ddd; padding-bottom: 3px; }
+                        .info-box p { margin: 2px 0; font-size: 12px; color: #333; }
+
+                        .items-box { margin-bottom: 20px; border: 1px solid #ddd; padding: 10px; border-radius: 6px; background: #fff; }
+
+                        /* Pag-aayos sa disenyo ng items sa loob ng PDF para maging magka-anyo sa preview */
+                        .d-flex { display: flex; display: -webkit-flex; }
+                        .align-items-center { align-items: center; }
+                        .justify-content-between { justify-content: space-between; }
+                        .gap-2 { gap: 10px; }
+                        .mb-2 { margin-bottom: 8px; }
+                        .border-bottom { border-bottom: 1px solid #eee; }
+                        .pb-2 { padding-bottom: 8px; }
+                        .fw-bold { font-weight: bold; }
+                        .text-dark { color: #212529; }
+                        .text-muted { color: #6c757d; font-size: 11px; }
+                        .rounded { border-radius: 4px; }
+                        .border { border: 1px solid #dee2e6; }
+
+                        .total-section { float: right; width: 250px; margin-top: 10px; background: #f8f9fa; padding: 10px; border-radius: 6px; border: 1px solid #ddd; text-align: right; font-size: 15px; font-weight: bold; }
+                        .clearfix::after { content: ""; clear: both; display: table; }
+
+                        .footer { text-align: center; margin-top: 40px; font-size: 11px; color: #777; border-top: 1px solid #ddd; padding-top: 10px; }
+
+                        @media print {
+                            body { padding: 0; background: #fff; }
+                            .invoice-container { border: none; padding: 0; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="invoice-container">
+                        <div class="header">
+                            <h2>NOOR SUPER MART</h2>
+                            <p>B2B Wholesale Distribution System | Official Invoice & Challan</p>
+                        </div>
+
+                        <div class="info-section">
+                            <div class="info-box">
+                                <h4>Customer Details</h4>
+                                <p><strong>Name:</strong> ${custName}</p>
+                                <p><strong>Shop:</strong> ${custShop}</p>
+                                <p><strong>Phone:</strong> ${custPhone}</p>
+                                <p><strong>Area:</strong> ${custArea}</p>
+                            </div>
+                            <div class="info-box" style="text-align: right;">
+                                <h4>Order Information</h4>
+                                <p><strong>Order No:</strong> ${orderNo}</p>
+                                <p><strong>Date:</strong> ${orderDate}</p>
+                                <p><strong>Status:</strong> <span style="color: #059669; font-weight: bold;">${orderStatus}</span></p>
+                            </div>
+                        </div>
+
+                        <div style="font-weight: bold; margin-bottom: 6px; font-size: 11px; text-transform: uppercase; color: #555;">Ordered Products Summary:</div>
+                        <div class="items-box">
+                            ${itemsHtmlContent}
+                        </div>
+
+                        <div class="clearfix">
+                            <div class="total-section">
+                                <span style="font-size: 13px; color: #555;">Grand Total:</span> <span style="color: #059669;">${totalAmount}</span>
+                            </div>
+                        </div>
+
+                        <div class="footer">
+                            <p>Thank you for your business! This is a system-generated B2B wholesale invoice.</p>
+                        </div>
+                    </div>
+
+                    <script>
+                        window.onload = function() {
+                            window.print();
+                            window.close();
+                        }
+                    <\/script>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+        }
+
     </script>
 @endsection

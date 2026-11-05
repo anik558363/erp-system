@@ -106,7 +106,7 @@
                     </li>
                     <li class="nav-item">
                         <a href="{{ route('orders.index') }}"
-                            class="nav-link d-flex align-items-center justify-content-between">
+                            class="nav-link d-flex align-items-center justify-content-between {{ request()->routeIs('orders.*') ? 'active' : '' }}">
                             <span><i data-lucide="clipboard-list" class="icon-sm me-2"></i>Orders</span>
                             <span class="badge rounded-pill bg-warning text-dark">1</span>
                         </a>

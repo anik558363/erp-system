@@ -131,6 +131,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/orders/{order}/edit', [OrderController::class, 'edit'])->name('orders.edit');
     Route::put('/orders/{order}', [OrderController::class, 'update'])->name('orders.update');
     Route::delete('/orders/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
+
+
+    // নতুন যুক্ত করুন: মডালের মাধ্যমে অর্ডার স্ট্যাটাস ও অ্যাপ্রুভাল আপডেট করার রুট
+    Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.status.update');
+    Route::delete('/orders/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
 });
 
 require __DIR__.'/auth.php';

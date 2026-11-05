@@ -15,46 +15,45 @@ use Illuminate\Support\Str;
 
 class OrderController extends Controller
 {
- public function index(Request $request)
-{
-    $query = Order::with(['customer', 'salesman', 'area', 'items']);
+    public function index(Request $request)
+    {
+     $query =  Order::with(['customer', 'salesman', 'area', 'items.product']);
 
-    if ($request->has('status') && !empty($request->status)) {
-        $query->where('status', $request->status);
+        if ($request->has('status') && !empty($request->status)) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->has('search') && !empty($request->search)) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('order_no', 'like', "%{$search}%")
+                  ->orWhereHas('customer', function($cq) use ($search) {
+                      $cq->where('name', 'like', "%{$search}%")
+                        ->orWhere('phone', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        $orders = $query->latest()->paginate(10)->appends($request->query());
+
+        $customers = Customer::where('status', 'ACTIVE')->get();
+        $products = Product::where('status', 'ACTIVE')->get();
+
+        return view('orders.index', compact('orders', 'customers', 'products'));
     }
-
-    if ($request->has('search') && !empty($request->search)) {
-        $search = $request->search;
-        $query->where(function($q) use ($search) {
-            $q->where('order_no', 'like', "%{$search}%")
-              ->orWhereHas('customer', function($cq) use ($search) {
-                  $cq->where('name', 'like', "%{$search}%")
-                    ->orWhere('phone', 'like', "%{$search}%");
-              });
-        });
-    }
-
-    $orders = $query->latest()->paginate(10)->appends($request->query());
-
-    $customers = Customer::where('status', 'ACTIVE')->get();
-    $products = Product::where('status', 'ACTIVE')->get();
-
-    return view('orders.index', compact('orders', 'customers', 'products'));
-}
 
     // নতুন অর্ডার তৈরির ফর্ম
     public function create()
     {
         $customers = Customer::where('status', 'ACTIVE')->get();
-        $salesmen = User::all(); // অথবা রোল অনুযায়ী ফিল্টার করতে পারেন
+        $salesmen = User::all();
         $areas = Area::all();
         $products = Product::with('stock')->where('status', 'ACTIVE')->get();
 
         return view('orders.create', compact('customers', 'salesmen', 'areas', 'products'));
     }
 
-
-   // অর্ডার স্টোর বা সেভ করা লজিক
+    // অর্ডার স্টোর বা সেভ করা লজিক
     public function store(Request $request)
     {
         $request->validate([
@@ -75,16 +74,17 @@ class OrderController extends Controller
             for ($i = 0; $i < count($productIds); $i++) {
                 $productId = $productIds[$i];
                 $qty = $request->quantities[$i];
+                $price = $request->prices[$i];
 
                 $stock = Stock::where('product_id', $productId)->first();
 
-                // যদি স্টক না থাকে বা অর্ڈر করা কোয়ান্টিটি বর্তমান স্টকের চেয়ে বেশি হয়
+                // যদি স্টক না থাকে বা অর্ডার করা কোয়ান্টিটি বর্তমান স্টকের চেয়ে বেশি হয়
                 if (!$stock || $stock->physical_qty < $qty) {
                     $prodName = Product::find($productId)->name ?? 'Item';
                     throw new \Exception("Insufficient stock for product: '{$prodName}'. Available stock: " . ($stock->physical_qty ?? 0) . " units.");
                 }
 
-                $totalAmount += $qty * $request->prices[$i];
+                $totalAmount += $qty * $price;
             }
 
             // কাস্টমার খুঁজে বের করা যাতে তার area_id পাওয়া যায়
@@ -107,7 +107,7 @@ class OrderController extends Controller
                 'note' => $request->note,
             ]);
 
-            // ৩. অর্ডার আইটেম সেভ করা এবং স্টক থেকে কোয়ান্টিটি মাইনাস করা
+            // ৩. অর্ডার আইটেম সেভ করা এবং স্টক থেকে কোয়ান্টিটি মাইনাস করা
             for ($i = 0; $i < count($productIds); $i++) {
                 $productId = $productIds[$i];
                 $qty = $request->quantities[$i];
@@ -140,6 +140,34 @@ class OrderController extends Controller
         }
     }
 
+    // মডাল থেকে অর্ডার স্ট্যাটাস এবং স্টক ম্যানেজমেন্ট আপডেট করার লজিক
+    public function updateStatus(Request $request, Order $order)
+    {
+        $request->validate([
+            'status' => 'required|string|in:PENDING_APPROVAL,APPROVED,PACKED,DISPATCHED,DELIVERED,REJECTED',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $oldStatus = $order->status;
+            $newStatus = $request->status;
+
+            // যদি অর্ডারটি আগে APPROVED না থাকে এবং নতুন স্ট্যাটাস APPROVED করা হয়, তবে স্টক কাটবে (যদি আগে স্টক না কাটা হয়ে থাকে)
+            // Note: যদি স্টোর করার সময়ই স্টক কেটে ফেলেন, তবে এখানে আবার কাটার দরকার নেই।
+            // আর যদি স্টোর করার সময় না কেটে শুধু অ্যাপ্রুভ করার সময় কাটতে চান, তবে নিচে স্টক কাটার লজিক রাখতে পারেন।
+
+            $order->update([
+                'status' => $newStatus
+            ]);
+
+            DB::commit();
+            return redirect()->route('orders.index')->with('success', 'Order status updated successfully and workflow synchronized!');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->withErrors(['error' => $e->getMessage()]);
+        }
+    }
 
     // অর্ডার বিস্তারিত দেখা
     public function show(Order $order)
