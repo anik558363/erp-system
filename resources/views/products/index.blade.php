@@ -17,7 +17,8 @@
                 <!-- Button to trigger Add New Product Modal -->
                 <button type="button"
                     class="btn btn-emerald text-white fw-semibold px-3 py-2 shadow-xs d-inline-flex align-items-center gap-2"
-                    style="background-color: #059669 !important; font-size: 13px;" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                    style="background-color: #059669 !important; font-size: 13px;" data-bs-toggle="modal"
+                    data-bs-target="#addProductModal">
                     <i data-lucide="plus-circle" class="icon-sm"></i> Add New Product
                 </button>
             </div>
@@ -137,7 +138,8 @@
                         style="font-size: 11px;">
                         <span class="d-flex align-items-center gap-1">
                             <i data-lucide="box" class="icon-xs text-secondary"></i> Available:
-                            {{ $product->stock->current_stock ?? 0 }} {{ $product->unit_type }}
+                            {{ number_format(($product->stock->physical_qty ?? 0) - ($product->stock->reserved_qty ?? 0)) }}
+                            {{ $product->unit_type }}
                         </span>
                         <form action="{{ route('products.destroy', $product->id) }}" method="POST"
                             onsubmit="return confirm('Are you sure to delete this product?');">
@@ -296,8 +298,8 @@
     @endif
 
     <!-- ==========================================
-                    MODAL 1: ADD NEW WHOLESALE PRODUCT
-                    ========================================== -->
+                        MODAL 1: ADD NEW WHOLESALE PRODUCT
+                        ========================================== -->
     <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -378,11 +380,11 @@
                                 <input type="number" step="0.01" name="mrp" class="form-control form-control-sm"
                                     placeholder="0" required>
                             </div>
-                            <div class="col-md-6">
+                            {{-- <div class="col-md-6">
                                 <label class="form-label small fw-semibold">Opening Stock *</label>
                                 <input type="number" name="opening_stock" class="form-control form-control-sm"
                                     placeholder="0" value="0" required>
-                            </div>
+                            </div> --}}
                             <div class="col-md-6">
                                 <label class="form-label small fw-semibold">Minimum Stock Alert *</label>
                                 <input type="number" name="min_stock" class="form-control form-control-sm"

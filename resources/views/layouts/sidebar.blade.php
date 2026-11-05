@@ -105,7 +105,8 @@
                         <a href="#" class="nav-link"><i data-lucide="user-check" class="icon-sm me-2"></i>Salesmen</a>
                     </li>
                     <li class="nav-item">
-                        <a href="#" class="nav-link d-flex align-items-center justify-content-between">
+                        <a href="{{ route('orders.index') }}"
+                            class="nav-link d-flex align-items-center justify-content-between">
                             <span><i data-lucide="clipboard-list" class="icon-sm me-2"></i>Orders</span>
                             <span class="badge rounded-pill bg-warning text-dark">1</span>
                         </a>
@@ -157,10 +158,18 @@
 
                 <!-- ৫. SALESMAN রোলের জন্য মেনু -->
                 @role('Salesman')
-                    <li class="nav-item">
+                    {{-- <li class="nav-item">
                         <a href="#" class="nav-link"><i data-lucide="shopping-bag" class="icon-sm me-2"></i>My
                             Orders
                             & Sales</a>
+                    </li> --}}
+
+                    <li class="nav-item">
+                        <a href="{{ route('orders.index') }}"
+                            class="nav-link d-flex align-items-center justify-content-between">
+                            <span><i data-lucide="clipboard-list" class="icon-sm me-2"></i>Orders</span>
+                            <span class="badge rounded-pill bg-warning text-dark">1</span>
+                        </a>
                     </li>
                 @endrole
 

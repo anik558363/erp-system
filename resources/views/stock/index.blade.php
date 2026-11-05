@@ -97,7 +97,7 @@
                             <th class="py-3">Product Name</th>
                             <th class="py-3">Unit</th>
                             <th class="py-3 text-center">Physical Stock</th>
-                            <th class="py-3 text-center">Current Stock</th>
+
                             <th class="py-3 text-center">Available Stock</th>
                             <th class="py-3 text-center">Damaged Stock</th>
                             <th class="py-3 text-center">Min Threshold</th>
@@ -129,8 +129,7 @@
                                 </td>
                                 <td class="text-center font-mono fw-bold text-dark">
                                     {{ number_format($stock->physical_qty ?? 0) }}</td>
-                                <td class="text-center font-mono text-info fw-semibold">
-                                    {{ number_format($stock->current_stock ?? 0) }}</td>
+                               
                                 <td class="text-center font-mono text-success fw-bold">
                                     {{ number_format(($stock->physical_qty ?? 0) - ($stock->reserved_qty ?? 0)) }}</td>
                                 <td class="text-center font-mono text-danger fw-semibold">
