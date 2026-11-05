@@ -17,6 +17,7 @@ use App\Http\Controllers\AreaController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\SupplierPaymentController;
 
 
 // ১. রুট ইউআরএল ('/') ওপেন করলে সরাসরি লগইন পেজে রিডাইরেক্ট করবে
@@ -85,10 +86,21 @@ Route::middleware(['auth', 'role:Owner|Office'])->group(function () {
     Route::delete('/suppliers/{supplier}', [SupplierController::class, 'destroy'])->name('suppliers.destroy');
 
 
-    // Purchases Routes
-    Route::get('/purchases', [PurchaseController::class, 'index'])->name('purchases.index');
+   Route::get('/purchases', [PurchaseController::class, 'index'])->name('purchases.index');
     Route::get('/purchases/create', [PurchaseController::class, 'create'])->name('purchases.create');
     Route::post('/purchases', [PurchaseController::class, 'store'])->name('purchases.store');
+    Route::get('/purchases/{purchase}', [PurchaseController::class, 'show'])->name('purchases.show');
+
+    // এই রুটটি যুক্ত করতে হবে:
+    Route::put('/purchases/{purchase}', [PurchaseController::class, 'update'])->name('purchases.update');
+
+// Supplier Payments Routes
+    Route::get('/supplier-payments', [SupplierPaymentController::class, 'index'])->name('supplier.payments.index');
+    Route::post('/supplier-payments', [SupplierPaymentController::class, 'store'])->name('supplier.payments.store');
+
+    // Stock Management Route
+    Route::get('/stock', [StockController::class, 'index'])->name('stock.index');
+    Route::post('/stock/adjust', [StockController::class, 'adjustStock'])->name('stock.adjust');
 
 });
 
