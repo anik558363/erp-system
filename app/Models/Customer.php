@@ -35,4 +35,35 @@ public function posSales()
 {
     return $this->hasMany(PosSale::class, 'customer_id');
 }
+
+public function payments() {
+    return $this->hasMany(CustomerPayment::class);
+}
+
+// Total purchase amount (order-er total_amount)
+public function totalOrdersAmount()
+{
+    return $this->orders()->sum('total_amount');
+}
+
+// Total paid amount (order-er paid + collection-er amount)
+public function totalPaidAmount()
+{
+    $orderPaid = $this->orders()->sum('paid_amount');
+    $collectedPayment = $this->payments()->sum('amount');
+    return $orderPaid + $collectedPayment;
+}
+
+// Real-time Current Due Calculation
+public function calculateCurrentDue()
+{
+    $openingDue = $this->opening_due ?? 0;
+    $totalOrders = $this->totalOrdersAmount();
+    $totalPaid = $this->totalPaidAmount();
+
+    // Formula: Opening Due + Total Orders - Total Paid
+    return ($openingDue + $totalOrders) - $totalPaid;
+}
+
+
 }

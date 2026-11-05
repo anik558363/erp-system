@@ -365,12 +365,24 @@
                                     <strong id="reviewTotal" class="text-success font-mono fs-6">-</strong>
                                 </div>
                             </div>
+
+                            <!-- Partial Payment Input Field (এখানে পেস্ট করবেন) -->
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">Paid Amount (BDT) *</label>
+                                <input type="number" name="paid_amount" id="modalPaidAmount"
+                                    class="form-control form-control-sm shadow-none font-mono" step="0.01"
+                                    min="0" value="0.00" oninput="calculateDueAmount()" required>
+                                <small class="text-muted font-mono" id="calcDueDisplay" style="font-size: 11px;">Due
+                                    Amount: ৳0.00</small>
+                            </div>
+
                             <div class="mb-3">
                                 <label class="form-label small fw-bold">Remarks / Notes</label>
                                 <textarea name="note" class="form-control shadow-none" rows="2"
                                     placeholder="Optional delivery instructions..."></textarea>
                             </div>
                         </div>
+
                     </div>
 
                     <div class="modal-footer bg-light py-2 justify-content-between" id="modalFooterBtns">
@@ -616,6 +628,23 @@
             updateModalView();
         }
 
+        function calculateDueAmount() {
+            let totalText = document.getElementById('reviewTotal').innerText.replace('৳', '').trim();
+            let total = parseFloat(totalText) || 0;
+            let paidInput = document.getElementById('modalPaidAmount');
+            let paid = parseFloat(paidInput.value) || 0;
+
+            // যদি Paid Amount, Total Amount-er চেয়ে বেশি হয়ে যায়, তবে আটকে দিবে
+            if (paid > total) {
+                alert('Paid amount cannot be greater than the total payable amount!');
+                paidInput.value = total.toFixed(2); // অটোমেটিক টোটাল অ্যামাউন্ট বসিয়ে দিবে
+                paid = total;
+            }
+
+            let due = total - paid;
+            document.getElementById('calcDueDisplay').innerText = `Due Amount: ৳${due.toFixed(2)}`;
+        }
+
         function prevStep() {
             currentModalStep--;
             if (currentModalStep < 1) currentModalStep = 1;
@@ -657,68 +686,12 @@
             }
         }
 
-        function openOrderDetailsModal(order) {
+function openOrderDetailsModal(order) {
             document.getElementById('modalOrderNo').innerText = order.order_no;
             document.getElementById('modalOrderDate').innerText = order.order_date;
             document.getElementById('modalOrderStatus').innerText = order.status;
 
-            document.getElementById('modalCustName').innerText = order.customer ? order.customer.name : 'N/A';
-            document.getElementById('modalCustShop').innerText = order.customer ? (order.customer.shop_name || order
-                .customer.name) : 'N/A';
-            document.getElementById('modalCustPhone').innerText = order.customer ? order.customer.phone : 'N/A';
-            document.getElementById('modalCustArea').innerText = order.area ? order.area.name : 'General';
-
-            document.getElementById('modalTotalAmount').innerText = '৳' + parseFloat(order.total_amount).toFixed(2);
-            document.getElementById('modalStatusSelect').value = order.status;
-            document.getElementById('orderApprovalForm').action = `/orders/${order.id}/status`;
-
-            let itemsList = document.getElementById('modalItemsList');
-            itemsList.innerHTML = '';
-
-            if (order.items && order.items.length > 0) {
-                order.items.forEach((item, index) => {
-                    let productName = item.product ? item.product.name : 'Product #' + item.product_id;
-
-                    // ডায়নামিক ইমেজ পাথ চেক করা (যদি ডেটাবেজে image ফিল্ড থাকে)
-                    let productImage = 'https://via.placeholder.com/40';
-                    if (item.product && item.product.image) {
-                        // যদি পাথে অলready http বা storage না থাকে, তবে সঠিক URL তৈরি করা
-                        if (item.product.image.startsWith('http')) {
-                            productImage = item.product.image;
-                        } else {
-                            productImage = `/storage/${item.product.image}`;
-                        }
-                    }
-
-                    let lineTotal = parseFloat(item.line_total || (item.quantity * item.unit_rate)).toFixed(2);
-
-                    itemsList.innerHTML += `
-                        <div class="d-flex align-items-center justify-content-between mb-2 border-bottom pb-2">
-                            <div class="d-flex align-items-center gap-2">
-                                <img src="${productImage}" alt="Product" class="rounded border" style="width: 35px; height: 35px; object-fit: cover;" onerror="this.src='https://via.placeholder.com/40'">
-                                <div>
-                                    <div class="fw-bold text-dark">${index + 1}. ${productName}</div>
-                                    <small class="text-muted font-mono">Qty: ${item.quantity} × ৳${item.unit_rate}</small>
-                                </div>
-                            </div>
-                            <strong class="font-mono text-dark">৳${lineTotal}</strong>
-                        </div>
-                    `;
-                });
-            } else {
-                itemsList.innerHTML = '<div class="text-center text-muted">No items found</div>';
-            }
-
-            let myModal = new bootstrap.Modal(document.getElementById('orderDetailsModal'));
-            myModal.show();
-        }
-
-        function openOrderDetailsModal(order) {
-            document.getElementById('modalOrderNo').innerText = order.order_no;
-            document.getElementById('modalOrderDate').innerText = order.order_date;
-            document.getElementById('modalOrderStatus').innerText = order.status;
-
-            // Ayusin ang pagkuha ng pangalan ng customer upang maiwasan ang "undefined"
+            // কাস্টমার নাম ঠিকভাবে তোলার লজিক (undefined রোধ করতে)
             let customerName = 'N/A';
             if (order.customer) {
                 customerName = order.customer.proprietor_name || order.customer.name || 'N/A';
@@ -729,7 +702,31 @@
             document.getElementById('modalCustPhone').innerText = order.customer ? (order.customer.phone || 'N/A') : 'N/A';
             document.getElementById('modalCustArea').innerText = order.area ? order.area.name : 'General';
 
-            document.getElementById('modalTotalAmount').innerText = '৳' + parseFloat(order.total_amount).toFixed(2);
+            // Financial Calculations (Total, Paid & Due)
+            let totalAmt = parseFloat(order.total_amount) || 0;
+            let paidAmt = parseFloat(order.paid_amount) || 0;
+            let dueAmt = totalAmt - paidAmt;
+
+            document.getElementById('modalTotalAmount').innerText = '৳' + totalAmt.toFixed(2);
+
+            // মডালের ভেতর যদি Paid ও Due দেখানোর আলাদা element রাখতে চান, নিচের ফিল্ডগুলো জেনারেট করবে
+            let totalSectionHtml = `
+                <div class="d-flex justify-content-between mb-1">
+                    <span class="text-muted">Total Amount:</span>
+                    <strong class="text-dark font-mono">৳${totalAmt.toFixed(2)}</strong>
+                </div>
+                <div class="d-flex justify-content-between mb-1">
+                    <span class="text-muted">Paid Amount:</span>
+                    <strong class="text-success font-mono">৳${paidAmt.toFixed(2)}</strong>
+                </div>
+                <div class="d-flex justify-content-between border-top pt-1 mt-1">
+                    <span class="fw-bold text-dark">Due Amount:</span>
+                    <strong class="text-danger font-mono fs-6">৳${dueAmt.toFixed(2)}</strong>
+                </div>
+            `;
+            // মডালের টোটাল অ্যামাউন্ট বক্সের আইডি আপডেট করা (বা নিচে ইনজেক্ট করা)
+            document.getElementById('modalTotalAmount').innerHTML = totalSectionHtml;
+
             document.getElementById('modalStatusSelect').value = order.status;
             document.getElementById('orderApprovalForm').action = `/orders/${order.id}/status`;
 
@@ -771,8 +768,14 @@
             let custShop = document.getElementById('modalCustShop').innerText;
             let custPhone = document.getElementById('modalCustPhone').innerText;
             let custArea = document.getElementById('modalCustArea').innerText;
-            let totalAmount = document.getElementById('modalTotalAmount').innerText;
+
+            // মডাল থেকে টotal, paid এবং due অ্যামাউন্ট বের করে আনা
             let itemsHtmlContent = document.getElementById('modalItemsList').innerHTML;
+
+            // হিসাব করার জন্য টোটাল ডেটা রি-ত্রিপ্লেট করা
+            let totalText = document.querySelector('#modalTotalAmount strong.text-dark').innerText;
+            let paidText = document.querySelector('#modalTotalAmount strong.text-success').innerText;
+            let dueText = document.querySelector('#modalTotalAmount strong.text-danger').innerText;
 
             let printWindow = window.open('', '_blank', 'width=900,height=700');
             printWindow.document.write(`
@@ -783,7 +786,7 @@
                     <style>
                         body { font-family: Arial, sans-serif; font-size: 13px; color: #333; padding: 20px; margin: 0; background: #fff; }
                         .invoice-container { max-width: 800px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
-                        .header { text-align: center; margin-bottom: 20px; border-bottom: 1px solid #059669; padding-bottom: 10px; }
+                        .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #059669; padding-bottom: 10px; }
                         .header h2 { margin: 0; color: #059669; font-size: 22px; }
                         .header p { margin: 5px 0 0; color: #555; font-size: 11px; text-transform: uppercase; }
 
@@ -794,7 +797,6 @@
 
                         .items-box { margin-bottom: 20px; border: 1px solid #ddd; padding: 10px; border-radius: 6px; background: #fff; }
 
-                        /* Pag-aayos sa disenyo ng items sa loob ng PDF para maging magka-anyo sa preview */
                         .d-flex { display: flex; display: -webkit-flex; }
                         .align-items-center { align-items: center; }
                         .justify-content-between { justify-content: space-between; }
@@ -808,7 +810,10 @@
                         .rounded { border-radius: 4px; }
                         .border { border: 1px solid #dee2e6; }
 
-                        .total-section { float: right; width: 250px; margin-top: 10px; background: #f8f9fa; padding: 10px; border-radius: 6px; border: 1px solid #ddd; text-align: right; font-size: 15px; font-weight: bold; }
+                        .total-section { float: right; width: 280px; margin-top: 10px; background: #f8f9fa; padding: 12px; border-radius: 6px; border: 1px solid #ddd; }
+                        .total-row { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 13px; }
+                        .grand-total { border-top: 1px solid #ddd; padding-top: 6px; margin-top: 4px; font-weight: bold; font-size: 14px; }
+
                         .clearfix::after { content: ""; clear: both; display: table; }
 
                         .footer { text-align: center; margin-top: 40px; font-size: 11px; color: #777; border-top: 1px solid #ddd; padding-top: 10px; }
@@ -849,7 +854,18 @@
 
                         <div class="clearfix">
                             <div class="total-section">
-                                <span style="font-size: 13px; color: #555;">Grand Total:</span> <span style="color: #059669;">${totalAmount}</span>
+                                <div class="total-row">
+                                    <span>Total Amount:</span>
+                                    <strong>${totalText}</strong>
+                                </div>
+                                <div class="total-row">
+                                    <span>Paid Amount:</span>
+                                    <strong style="color: #059669;">${paidText}</strong>
+                                </div>
+                                <div class="total-row grand-total">
+                                    <span>Due Amount:</span>
+                                    <strong style="color: #dc2626;">${dueText}</strong>
+                                </div>
                             </div>
                         </div>
 

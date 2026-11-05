@@ -17,7 +17,7 @@ class OrderController extends Controller
 {
     public function index(Request $request)
     {
-     $query =  Order::with(['customer', 'salesman', 'area', 'items.product']);
+        $query = Order::with(['customer', 'salesman', 'area', 'items.product']);
 
         if ($request->has('status') && !empty($request->status)) {
             $query->where('status', $request->status);
@@ -63,6 +63,7 @@ class OrderController extends Controller
             'products' => 'required|array|min:1',
             'quantities' => 'required|array',
             'prices' => 'required|array',
+            'paid_amount' => 'nullable|numeric|min:0',
         ]);
 
         DB::beginTransaction();
@@ -93,7 +94,7 @@ class OrderController extends Controller
             // ইউনিক অর্ডার নম্বর জেনারেট করা
             $orderNo = 'NSM-ORD-' . date('ymd') . '-' . strtoupper(Str::random(4));
 
-            // ২. অর্ডার তৈরি করা
+            // ২. অর্ডার তৈরি করা (Partial Payment সহ)
             $order = Order::create([
                 'order_no' => $orderNo,
                 'customer_id' => $request->customer_id,
@@ -132,7 +133,7 @@ class OrderController extends Controller
             }
 
             DB::commit();
-            return redirect()->route('orders.index')->with('success', 'Order created successfully and stock updated!');
+            return redirect()->route('orders.index')->with('success', 'Order created successfully, payment recorded, and stock updated!');
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -151,10 +152,6 @@ class OrderController extends Controller
         try {
             $oldStatus = $order->status;
             $newStatus = $request->status;
-
-            // যদি অর্ডারটি আগে APPROVED না থাকে এবং নতুন স্ট্যাটাস APPROVED করা হয়, তবে স্টক কাটবে (যদি আগে স্টক না কাটা হয়ে থাকে)
-            // Note: যদি স্টোর করার সময়ই স্টক কেটে ফেলেন, তবে এখানে আবার কাটার দরকার নেই।
-            // আর যদি স্টোর করার সময় না কেটে শুধু অ্যাপ্রুভ করার সময় কাটতে চান, তবে নিচে স্টক কাটার লজিক রাখতে পারেন।
 
             $order->update([
                 'status' => $newStatus

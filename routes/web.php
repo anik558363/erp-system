@@ -18,6 +18,8 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\SupplierPaymentController;
+use App\Http\Controllers\CustomerPaymentController;
+
 
 
 
@@ -72,6 +74,7 @@ Route::middleware(['auth', 'role:Owner|Office'])->group(function () {
     Route::post('/customers', [CustomerController::class, 'store'])->name('customers.store');
     Route::put('/customers/{customer}', [CustomerController::class, 'update'])->name('customers.update');
     Route::delete('/customers/{customer}', [CustomerController::class, 'destroy'])->name('customers.destroy');
+    Route::get('/customers/{customer}/ledger', [CustomerController::class, 'ledger'])->name('customers.ledger');
 
 
     // Products Routes
@@ -136,6 +139,15 @@ Route::middleware(['auth'])->group(function () {
     // নতুন যুক্ত করুন: মডালের মাধ্যমে অর্ডার স্ট্যাটাস ও অ্যাপ্রুভাল আপডেট করার রুট
     Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.status.update');
     Route::delete('/orders/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
+
+    // Customer Payments / Due Collection Routes
+    Route::get('/customer-payments', [CustomerPaymentController::class, 'index'])->name('customers.payments.index');
+    Route::post('/customer-payments', [CustomerPaymentController::class, 'store'])->name('customers.payments.store');
+
 });
+
+
+
+
 
 require __DIR__.'/auth.php';

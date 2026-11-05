@@ -72,7 +72,7 @@
 
                     <li class="nav-item">
                         <a href="{{ route('customers.index') }}"
-                            class="nav-link {{ request()->routeIs('customers.*') ? 'active' : '' }}">
+                            class="nav-link {{ request()->routeIs('customers.index') || request()->routeIs('customers.edit') ? 'active' : '' }}">
                             <i data-lucide="users" class="icon-sm me-2"></i>Customers
                         </a>
                     </li>
@@ -115,16 +115,23 @@
                         <a href="delivery.html" class="nav-link"><i data-lucide="truck"
                                 class="icon-sm me-2"></i>Delivery</a>
                     </li>
+
                     <li class="nav-item">
                         <a href="#" class="nav-link"><i data-lucide="rotate-ccw" class="icon-sm me-2"></i>Returns</a>
                     </li>
+
+                    <!-- Payments menu-ti update kore route bosano holo -->
                     <li class="nav-item">
-                        <a href="#" class="nav-link"><i data-lucide="credit-card"
-                                class="icon-sm me-2"></i>Payments</a>
+                        <a href="{{ route('customers.payments.index') }}"
+                            class="nav-link {{ request()->routeIs('customers.payments.*') ? 'active' : '' }}">
+                            <i data-lucide="credit-card" class="icon-sm me-2"></i>Payments & Collections
+                        </a>
                     </li>
+
                     <li class="nav-item">
                         <a href="#" class="nav-link"><i data-lucide="book-open" class="icon-sm me-2"></i>Ledger</a>
                     </li>
+
                     <li class="nav-item">
                         <a href="{{ route('expenses.index') }}" class="nav-link"><i data-lucide="receipt"
                                 class="icon-sm me-2"></i>Expenses</a>
