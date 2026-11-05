@@ -20,6 +20,7 @@ use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\SupplierPaymentController;
 
 
+
 // ১. রুট ইউআরএল ('/') ওপেন করলে সরাসরি লগইন পেজে রিডাইরেক্ট করবে
 Route::get('/', function () {
     return redirect()->route('login');
@@ -119,6 +120,17 @@ Route::middleware(['auth', 'permission:approve-orders'])->group(function () {
 Route::middleware(['auth', 'role:Delivery'])->group(function () {
     Route::get('/delivery/assigned', [DeliveryController::class, 'assignedList'])->name('delivery.assigned');
     Route::post('/delivery/update-status/{id}', [DeliveryController::class, 'updateStatus'])->name('delivery.update-status');
+});
+
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/create', [OrderController::class, 'create'])->name('orders.create');
+    Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+    Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+    Route::get('/orders/{order}/edit', [OrderController::class, 'edit'])->name('orders.edit');
+    Route::put('/orders/{order}', [OrderController::class, 'update'])->name('orders.update');
+    Route::delete('/orders/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
 });
 
 require __DIR__.'/auth.php';

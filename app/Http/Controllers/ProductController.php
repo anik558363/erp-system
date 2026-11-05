@@ -44,7 +44,7 @@ class ProductController extends Controller
             'purchase_price' => 'required|numeric',
             'wholesale_price' => 'required|numeric',
             'mrp' => 'required|numeric',
-            'opening_stock' => 'required|integer',
+            'opening_stock' => 'nullable|integer',
             'min_stock' => 'required|integer',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
