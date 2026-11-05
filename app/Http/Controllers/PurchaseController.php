@@ -133,4 +133,47 @@ $purchase = Purchase::create([
             return back()->withErrors(['error' => 'Something went wrong: ' . $e->getMessage()])->withInput();
         }
     }
+
+    public function update(Request $request, Purchase $purchase)
+{
+    $request->validate([
+        'supplier_id' => 'required|exists:suppliers,id',
+        'purchase_date' => 'required|date',
+        'status' => 'required|in:DRAFT,RECEIVED',
+    ]);
+
+    try {
+        DB::beginTransaction();
+
+        // যদি আগে DRAFT থাকে এবং এখন RECEIVED করা হয়, তবে স্টক বাড়িয়ে দিতে হবে
+        if ($purchase->status == 'DRAFT' && $request->status == 'RECEIVED') {
+            foreach ($purchase->items as $item) {
+                // আপনার প্রজেক্টের স্টক লজিক অনুযায়ী (যেমন: warehouse বা stock table)
+                \App\Models\Stock::updateOrCreate(
+                    ['product_id' => $item->product_id],
+                    ['physical_qty' => \DB::raw('physical_qty + ' . $item->quantity)]
+                );
+            }
+        }
+
+        $purchase->update([
+            'supplier_id' => $request->supplier_id,
+            'purchase_date' => $request->purchase_date,
+            'status' => $request->status,
+            'note' => $request->note,
+        ]);
+
+        DB::commit();
+        return redirect()->route('purchases.index')->with('success', 'Purchase updated successfully!');
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return redirect()->back()->with('error', 'Error: ' . $e->getMessage());
+    }
+}
+
+    public function show(Purchase $purchase)
+{
+    $purchase->load(['supplier', 'items.product']);
+    return view('purchases.show', compact('purchase'));
+}
 }

@@ -118,9 +118,20 @@
                                         {{ $purchase->status ?? 'RECEIVED' }}
                                     </span>
                                 </td>
+                                <!-- একশন কলামের ভেতরে এডিট বাটনটি এভাবে দিন -->
                                 <td class="text-end">
-                                    <button class="btn btn-sm btn-light border text-secondary p-1" title="View Details"><i
-                                            data-lucide="eye" class="icon-xs"></i></button>
+                                    <a href="{{ route('purchases.show', $purchase->id) }}"
+                                        class="btn btn-sm btn-light border text-secondary p-1" title="View Details">
+                                        <i data-lucide="eye" class="icon-xs"></i>
+                                    </a>
+
+                                    @if ($purchase->status == 'DRAFT')
+                                        <button type="button" class="btn btn-sm btn-light border text-primary p-1 ms-1"
+                                            title="Edit Draft" data-bs-toggle="modal"
+                                            data-bs-target="#editPurchaseModal{{ $purchase->id }}">
+                                            <i data-lucide="edit" class="icon-xs"></i>
+                                        </button>
+                                    @endif
                                 </td>
                             </tr>
                         @empty
@@ -145,8 +156,8 @@
     @endif
 
     <!-- ==========================================
-            MODAL: NEW SUPPLIER PURCHASE ENTRY
-            ========================================== -->
+                    MODAL: NEW SUPPLIER PURCHASE ENTRY
+                    ========================================== -->
     <div class="modal fade" id="newPurchaseModal" tabindex="-1" aria-labelledby="newPurchaseModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-xl">
             <div class="modal-content border-0 shadow-lg">
@@ -168,7 +179,8 @@
                                     <option value="">Select Supplier</option>
                                     @foreach ($suppliers as $supplier)
                                         <option value="{{ $supplier->id }}">{{ $supplier->company_name }}
-                                            ({{ $supplier->name }})</option>
+                                            ({{ $supplier->name }})
+                                        </option>
                                     @endforeach
                                 </select>
                             </div>
@@ -308,6 +320,68 @@
             </div>
         </div>
     </div>
+
+    @foreach($purchases as $purchase)
+    @if($purchase->status == 'DRAFT')
+        <div class="modal fade" id="editPurchaseModal{{ $purchase->id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                    <form action="{{ route('purchases.update', $purchase->id) }}" method="POST">
+                        @csrf
+                        @method('PUT')
+                        <div class="modal-header bg-light px-4 py-3 border-bottom">
+                            <h5 class="modal-title fw-bold text-dark fs-6 d-flex align-items-center gap-2">
+                                <i data-lucide="edit-3" class="icon-sm text-emerald" style="color: #059669;"></i>
+                                Edit Draft Purchase <span class="font-mono text-muted small">(#{{ $purchase->chalan_no }})</span>
+                            </h5>
+                            <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body p-4 text-start">
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-secondary text-uppercase" style="font-size: 11px;">Supplier Name *</label>
+                                <select name="supplier_id" class="form-select shadow-none py-2" required>
+                                    @foreach($suppliers as $supplier)
+                                        <option value="{{ $supplier->id }}" {{ $purchase->supplier_id == $supplier->id ? 'selected' : '' }}>
+                                            {{ $supplier->company_name }} ({{ $supplier->name }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold text-secondary text-uppercase" style="font-size: 11px;">Purchase Date *</label>
+                                    <input type="date" name="purchase_date" class="form-control shadow-none py-2 font-mono" value="{{ $purchase->purchase_date }}" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold text-secondary text-uppercase" style="font-size: 11px;">Status *</label>
+                                    <select name="status" class="form-select shadow-none py-2 fw-semibold text-dark" required>
+                                        <option value="DRAFT" {{ $purchase->status == 'DRAFT' ? 'selected' : '' }}>DRAFT</option>
+                                        <option value="RECEIVED" {{ $purchase->status == 'RECEIVED' ? 'selected' : '' }}>RECEIVED (Update Stock)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-text text-muted mb-3" style="font-size: 11px;">
+                                <i data-lucide="info" class="icon-xs me-1 text-primary"></i> Status changing to <strong>RECEIVED</strong> go automatically add di items to warehouse inventory stock.
+                            </div>
+
+                            <div class="mb-0">
+                                <label class="form-label small fw-bold text-secondary text-uppercase" style="font-size: 11px;">Note / Remarks</label>
+                                <textarea name="note" class="form-control shadow-none" rows="3" placeholder="Add any optional notes here...">{{ $purchase->note }}</textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer bg-light px-4 py-3 border-top">
+                            <button type="button" class="btn btn-outline-secondary btn-sm px-4 fw-semibold" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-emerald btn-sm text-white px-4 fw-semibold shadow-xs" style="background-color: #059669 !important;">
+                                <i data-lucide="check" class="icon-xs me-1"></i> Update Status
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    @endif
+@endforeach
 
 
 
