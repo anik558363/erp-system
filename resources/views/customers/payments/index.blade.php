@@ -100,91 +100,83 @@
     </div>
 
     <!-- Collect Payment Modal -->
-    <div class="modal fade" id="addPaymentModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <form action="{{ route('customers.payments.store') }}" method="POST" class="modal-content border-0 shadow">
-                @csrf
-                <div class="modal-header bg-light py-3">
-                    <h5 class="modal-title fw-bold text-dark fs-6">
-                        <i data-lucide="credit-card" class="icon-sm me-1 text-success"></i> Collect Due Payment
-                    </h5>
-                    <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal"></button>
+<div class="modal fade" id="addPaymentModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <form action="{{ route('customers.payments.store') }}" method="POST" class="modal-content border-0 shadow">
+            @csrf
+            <div class="modal-header bg-light py-3">
+                <h5 class="modal-title fw-bold text-dark fs-6">
+                    <i data-lucide="credit-card" class="icon-sm me-1 text-success"></i> Collect Due Payment
+                </h5>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4 small">
+                <!-- Searchable Customer Input -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Search & Select Customer *</label>
+                    <input type="text" class="form-control form-control-sm shadow-none font-mono" placeholder="Type customer name or phone..." list="customerList" id="customerSearchInput" autocomplete="off" required>
+
+                    <datalist id="customerList">
+                        @foreach($customers as $customer)
+                        <option value="{{ $customer->proprietor_name }} - {{ $customer->phone }} (Shop: {{ $customer->shop_name ?? 'N/A' }}) [ID:{{ $customer->id }}]">
+                        @endforeach
+                    </datalist>
+
+                    <!-- Hidden input to store actual customer_id -->
+                    <input type="hidden" name="customer_id" id="selectedCustomerId" required>
+                    <small class="text-muted" style="font-size: 10px;">Type name or phone number and select from the list.</small>
                 </div>
-                <div class="modal-body p-4 small">
-                    <!-- Searchable Customer Input -->
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Search & Select Customer *</label>
-                        <input type="text" class="form-control form-control-sm shadow-none font-mono"
-                            placeholder="Type customer name or phone..." list="customerList" id="customerSearchInput"
-                            autocomplete="off" required>
 
-                        <datalist id="customerList">
-                            @foreach ($customers as $customer)
-                                <option
-                                    value="{{ $customer->proprietor_name }} - {{ $customer->phone }} (Shop: {{ $customer->shop_name ?? 'N/A' }}) [ID:{{ $customer->id }}]">
-                            @endforeach
-                        </datalist>
-
-                        <!-- Hidden input to store actual customer_id -->
-                        <input type="hidden" name="customer_id" id="selectedCustomerId" required>
-                        <small class="text-muted" style="font-size: 10px;">Type name or phone number and select from the
-                            list.</small>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Amount (BDT) *</label>
+                        <input type="number" name="amount" class="form-control form-control-sm shadow-none font-mono" step="0.01" min="1" placeholder="0.00" required>
                     </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Amount (BDT) *</label>
-                            <input type="number" name="amount" class="form-control form-control-sm shadow-none font-mono"
-                                step="0.01" min="1" placeholder="0.00" required>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Payment Method *</label>
-                            <select name="payment_method" class="form-select form-select-sm shadow-none" required>
-                                <option value="CASH">CASH</option>
-                                <option value="BKASH">BKASH</option>
-                                <option value="BANK">BANK</option>
-                                <option value="CHEQUE">CHEQUE</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Payment Date *</label>
-                            <input type="date" name="payment_date" class="form-control form-control-sm shadow-none"
-                                value="{{ date('Y-m-d') }}" required>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Reference No / TrxID</label>
-                            <input type="text" name="reference_no" class="form-control form-control-sm shadow-none"
-                                placeholder="Optional transaction ID">
-                        </div>
-                    </div>
-                    <div class="mb-0">
-                        <label class="form-label fw-bold">Note / Remarks</label>
-                        <textarea name="note" class="form-control shadow-none" rows="2" placeholder="Optional remarks..."></textarea>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Payment Method *</label>
+                        <select name="payment_method" class="form-select form-select-sm shadow-none" required>
+                            <option value="CASH">CASH</option>
+                            <option value="BKASH">BKASH</option>
+                            <option value="BANK">BANK</option>
+                            <option value="CHEQUE">CHEQUE</option>
+                        </select>
                     </div>
                 </div>
-                <div class="modal-footer bg-light py-2">
-                    <button type="button" class="btn btn-outline-secondary btn-sm"
-                        data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-success btn-sm px-4">Save Payment</button>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Payment Date *</label>
+                        <input type="date" name="payment_date" class="form-control form-control-sm shadow-none" value="{{ date('Y-m-d') }}" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Reference No / TrxID</label>
+                        <input type="text" name="reference_no" class="form-control form-control-sm shadow-none" placeholder="Optional transaction ID">
+                    </div>
                 </div>
-            </form>
-        </div>
+                <div class="mb-0">
+                    <label class="form-label fw-bold">Note / Remarks</label>
+                    <textarea name="note" class="form-control shadow-none" rows="2" placeholder="Optional remarks..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer bg-light py-2">
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-success btn-sm px-4">Save Payment</button>
+            </div>
+        </form>
     </div>
+</div>
 
-    <!-- JavaScript to capture Customer ID from Search Input -->
-    <script>
-        document.getElementById('customerSearchInput').addEventListener('input', function(e) {
-            let val = e.target.value;
-            let match = val.match(/\[ID:(\d+)\]/);
-            let customerIdField = document.getElementById('selectedCustomerId');
+<!-- JavaScript to capture Customer ID from Search Input -->
+<script>
+    document.getElementById('customerSearchInput').addEventListener('input', function(e) {
+        let val = e.target.value;
+        let match = val.match(/\[ID:(\d+)\]/);
+        let customerIdField = document.getElementById('selectedCustomerId');
 
-            if (match) {
-                customerIdField.value = match[1];
-            } else {
-                customerIdField.value = '';
-            }
-        });
-    </script>
+        if (match) {
+            customerIdField.value = match[1];
+        } else {
+            customerIdField.value = '';
+        }
+    });
+</script>
 @endsection

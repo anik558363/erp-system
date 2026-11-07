@@ -106,7 +106,6 @@ class DeliveryController extends Controller
         }
     }
 
-     // ফিল্ড থেকে বকেয়া কালেকশন বা পেমেন্ট সেভ করা
   // ফিল্ড থেকে বকেয়া কালেকশন বা পেমেন্ট সেভ করা
     public function store(Request $request)
     {
