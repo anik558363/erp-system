@@ -49,6 +49,53 @@
                             <i data-lucide="package" class="icon-sm me-2"></i>Products
                         </a>
                     </li>
+
+
+                   <!-- POS Management Dropdown Menu -->
+                    <li class="nav-item">
+                        <a href="#posSubmenu" data-bs-toggle="collapse"
+                            class="nav-link d-flex align-items-center justify-content-between {{ request()->routeIs('pos.*') ? 'active' : '' }}">
+                            <div class="d-flex align-items-center">
+                                <i data-lucide="shopping-cart" class="icon-sm me-2"></i>
+                                <span>POS Management</span>
+                            </div>
+                            <i data-lucide="chevron-down" class="icon-xs"></i>
+                        </a>
+                        <div class="collapse {{ request()->routeIs('pos.*') ? 'show' : '' }}" id="posSubmenu">
+                            <ul class="nav flex-column ms-3 ps-2 border-start border-secondary border-opacity-25 mt-1 gap-1"
+                                style="font-size: 12px;">
+                                <!-- ১. Registers CRUD -->
+                                <li class="nav-item">
+                                    <a href="{{ route('pos.registers.index') }}"
+                                        class="nav-link py-1 {{ request()->routeIs('pos.registers.*') ? 'fw-bold text-emerald' : 'text-secondary' }}">
+                                        Registers CRUD
+                                    </a>
+                                </li>
+                                <!-- ২. Shift & Register -->
+                                <li class="nav-item">
+                                    <a href="{{ route('pos.shift.index') }}"
+                                        class="nav-link py-1 {{ request()->routeIs('pos.shift.*') ? 'fw-bold text-emerald' : 'text-secondary' }}">
+                                        Shift & Register
+                                    </a>
+                                </li>
+                                <!-- ৩. POS Terminal -->
+                                <li class="nav-item">
+                                    <a href="{{ route('pos.index') }}"
+                                        class="nav-link py-1 {{ request()->routeIs('pos.index') || request()->routeIs('pos.store') ? 'fw-bold text-emerald' : 'text-secondary' }}">
+                                        POS Terminal
+                                    </a>
+                                </li>
+                                <!-- ৪. নতুন যোগ করা Sales History & Invoices -->
+                                <li class="nav-item">
+                                    <a href="{{ route('pos.sales.index') }}"
+                                        class="nav-link py-1 {{ request()->routeIs('pos.sales.*') ? 'fw-bold text-emerald' : 'text-secondary' }}">
+                                        Sales History & Invoices
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+
                     <li class="nav-item">
                         <a href="{{ route('categories.index') }}"
                             class="nav-link {{ request()->routeIs('categories.*') ? 'active' : '' }}">
@@ -118,13 +165,15 @@
 
                     <!-- Delivery Menu Route Added -->
                     <li class="nav-item">
-                        <a href="{{ route('delivery.index') }}" class="nav-link {{ request()->routeIs('delivery.*') ? 'active' : '' }}">
+                        <a href="{{ route('delivery.index') }}"
+                            class="nav-link {{ request()->routeIs('delivery.*') ? 'active' : '' }}">
                             <i data-lucide="truck" class="icon-sm me-2"></i>Delivery
                         </a>
                     </li>
 
                     <li class="nav-item">
-                        <a href="#" class="nav-link"><i data-lucide="rotate-ccw" class="icon-sm me-2"></i>Returns</a>
+                        <a href="#" class="nav-link"><i data-lucide="rotate-ccw"
+                                class="icon-sm me-2"></i>Returns</a>
                     </li>
 
                     <!-- Payments menu -->
@@ -136,16 +185,19 @@
                     </li>
 
                     <li class="nav-item">
-                        <a href="#" class="nav-link"><i data-lucide="book-open" class="icon-sm me-2"></i>Ledger</a>
+                        <a href="#" class="nav-link"><i data-lucide="book-open"
+                                class="icon-sm me-2"></i>Ledger</a>
                     </li>
 
                     <li class="nav-item">
-                        <a href="{{ route('expenses.index') }}" class="nav-link {{ request()->routeIs('expenses.*') ? 'active' : '' }}"><i data-lucide="receipt"
-                                class="icon-sm me-2"></i>Expenses</a>
+                        <a href="{{ route('expenses.index') }}"
+                            class="nav-link {{ request()->routeIs('expenses.*') ? 'active' : '' }}"><i
+                                data-lucide="receipt" class="icon-sm me-2"></i>Expenses</a>
                     </li>
                     <li class="nav-item">
-                        <a href="{{ route('reports.index') }}" class="nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}"><i data-lucide="bar-chart-2"
-                                class="icon-sm me-2"></i>Reports</a>
+                        <a href="{{ route('reports.index') }}"
+                            class="nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}"><i
+                                data-lucide="bar-chart-2" class="icon-sm me-2"></i>Reports</a>
                     </li>
                 @endrole
 
@@ -164,8 +216,9 @@
                 <!-- ৪. DELIVERY রোলের জন্য মেনু -->
                 @role('Delivery')
                     <li class="nav-item">
-                        <a href="{{ route('delivery.index') }}" class="nav-link {{ request()->routeIs('delivery.*') ? 'active' : '' }}"><i data-lucide="truck"
-                                class="icon-sm me-2"></i>Assigned Deliveries</a>
+                        <a href="{{ route('delivery.index') }}"
+                            class="nav-link {{ request()->routeIs('delivery.*') ? 'active' : '' }}"><i
+                                data-lucide="truck" class="icon-sm me-2"></i>Assigned Deliveries</a>
                     </li>
                 @endrole
 
