@@ -51,7 +51,7 @@
                     </li>
 
 
-                   <!-- POS Management Dropdown Menu -->
+                    <!-- POS Management Dropdown Menu -->
                     <li class="nav-item">
                         <a href="#posSubmenu" data-bs-toggle="collapse"
                             class="nav-link d-flex align-items-center justify-content-between {{ request()->routeIs('pos.*') ? 'active' : '' }}">
@@ -85,11 +85,18 @@
                                         POS Terminal
                                     </a>
                                 </li>
-                                <!-- ৪. নতুন যোগ করা Sales History & Invoices -->
+                                <!-- ৪. Sales History & Invoices -->
                                 <li class="nav-item">
                                     <a href="{{ route('pos.sales.index') }}"
                                         class="nav-link py-1 {{ request()->routeIs('pos.sales.*') ? 'fw-bold text-emerald' : 'text-secondary' }}">
                                         Sales History & Invoices
+                                    </a>
+                                </li>
+                                <!-- ৫. নতুন যোগ করা POS Returns -->
+                                <li class="nav-item">
+                                    <a href="{{ route('pos.returns.index') }}"
+                                        class="nav-link py-1 {{ request()->routeIs('pos.returns.*') ? 'fw-bold text-emerald' : 'text-secondary' }}">
+                                        POS Returns
                                     </a>
                                 </li>
                             </ul>
@@ -153,7 +160,8 @@
                     </li>
 
                     <li class="nav-item">
-                        <a href="#" class="nav-link"><i data-lucide="user-check" class="icon-sm me-2"></i>Salesmen</a>
+                        <a href="#" class="nav-link"><i data-lucide="user-check"
+                                class="icon-sm me-2"></i>Salesmen</a>
                     </li>
                     <li class="nav-item">
                         <a href="{{ route('orders.index') }}"

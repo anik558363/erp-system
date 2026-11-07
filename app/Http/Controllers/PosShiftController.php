@@ -69,6 +69,8 @@ class PosShiftController extends Controller
 
         $expectedCash = $shift->opening_cash + $totalCashSales;
         $countedCash = (float) $request->counted_cash;
+
+        // ফিক্সড: কাউন্টেড ক্যাশ থেকে এক্সপেক্টেড ক্যাশ বিয়োগ করে ডিফারেন্স হিসাব করা হলো
         $difference = $countedCash - $expectedCash;
 
         $shift->update([

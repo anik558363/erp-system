@@ -23,6 +23,10 @@ use App\Http\Controllers\PosController; // POS কন্ট্রোলার �
 use App\Http\Controllers\PosShiftController;
 use App\Http\Controllers\PosRegisterController;
 
+use App\Http\Controllers\PosReturnController;
+
+
+
 
 
 
@@ -74,6 +78,11 @@ Route::middleware(['auth', 'role:Owner|Office'])->group(function () {
 Route::get('/pos/sales', [PosController::class, 'salesHistory'])->name('pos.sales.index');
 Route::get('/pos/sales/{sale}', [PosController::class, 'showReceipt'])->name('pos.sales.receipt');
 Route::delete('/pos/sales/{sale}', [PosController::class, 'destroySale'])->name('pos.sales.destroy');
+
+// POS Returns Routes
+Route::get('/pos/returns', [PosReturnController::class, 'index'])->name('pos.returns.index');
+Route::get('/pos/returns/create', [PosReturnController::class, 'create'])->name('pos.returns.create');
+Route::post('/pos/returns', [PosReturnController::class, 'store'])->name('pos.returns.store');
 
     // Category Management Routes
     Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
