@@ -34,12 +34,14 @@ class OrderController extends Controller
             });
         }
 
+         $deliveryMen = User::role('Delivery')->get();
+
         $orders = $query->latest()->paginate(10)->appends($request->query());
 
         $customers = Customer::where('status', 'ACTIVE')->get();
         $products = Product::where('status', 'ACTIVE')->get();
 
-        return view('orders.index', compact('orders', 'customers', 'products'));
+        return view('orders.index', compact('orders', 'customers', 'products', 'deliveryMen'));
     }
 
     // নতুন অর্ডার তৈরির ফর্ম

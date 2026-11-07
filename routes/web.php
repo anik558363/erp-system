@@ -20,17 +20,14 @@ use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\SupplierPaymentController;
 use App\Http\Controllers\CustomerPaymentController;
 
-
-
-
 // ১. রুট ইউআরএল ('/') ওপেন করলে সরাসরি লগইন পেজে রিডাইরেক্ট করবে
 Route::get('/', function () {
     return redirect()->route('login');
 });
 
-// ডিফল্ট ড্যাশবোর্ড (লগইন এবং ভেরিফাইড ইউজারদের জন্য - যা কন্ট্রোলারের মাধ্যমে রোল অনুযায়ী ড্যাশবোর্ড দেখাবে)
+// ডিফল্ট ড্যাশবোর্ড (লগইন এবং ভেরিফাইড ইউজারদের জন্য - যা কন্ট্রোলারের মাধ্যমে রোল অনুযায়ী ড্যাশবোর্ড দেখাবে)
 Route::get('/dashboard', [DashboardController::class, 'index'])
-    ->middleware(['auth', 'verified', 'status']) // 'status' ekhane add kora holo
+    ->middleware(['auth', 'verified', 'status'])
     ->name('dashboard');
 
 // প্রোফাইল ম্যানেজমেন্ট রাউট
@@ -50,8 +47,7 @@ Route::middleware(['auth', 'role:Owner|Office'])->group(function () {
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
     Route::get('/expenses', [ExpenseController::class, 'index'])->name('expenses.index');
 
-
-// Category Management Routes
+    // Category Management Routes
     Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
     Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
     Route::put('/categories/{category}', [CategoryController::class, 'update'])->name('categories.update');
@@ -76,7 +72,6 @@ Route::middleware(['auth', 'role:Owner|Office'])->group(function () {
     Route::delete('/customers/{customer}', [CustomerController::class, 'destroy'])->name('customers.destroy');
     Route::get('/customers/{customer}/ledger', [CustomerController::class, 'ledger'])->name('customers.ledger');
 
-
     // Products Routes
     Route::get('/products', [ProductController::class, 'index'])->name('products.index');
     Route::post('/products', [ProductController::class, 'store'])->name('products.store');
@@ -89,23 +84,19 @@ Route::middleware(['auth', 'role:Owner|Office'])->group(function () {
     Route::put('/suppliers/{supplier}', [SupplierController::class, 'update'])->name('suppliers.update');
     Route::delete('/suppliers/{supplier}', [SupplierController::class, 'destroy'])->name('suppliers.destroy');
 
-
-   Route::get('/purchases', [PurchaseController::class, 'index'])->name('purchases.index');
+    Route::get('/purchases', [PurchaseController::class, 'index'])->name('purchases.index');
     Route::get('/purchases/create', [PurchaseController::class, 'create'])->name('purchases.create');
     Route::post('/purchases', [PurchaseController::class, 'store'])->name('purchases.store');
     Route::get('/purchases/{purchase}', [PurchaseController::class, 'show'])->name('purchases.show');
-
-    // এই রুটটি যুক্ত করতে হবে:
     Route::put('/purchases/{purchase}', [PurchaseController::class, 'update'])->name('purchases.update');
 
-// Supplier Payments Routes
+    // Supplier Payments Routes
     Route::get('/supplier-payments', [SupplierPaymentController::class, 'index'])->name('supplier.payments.index');
     Route::post('/supplier-payments', [SupplierPaymentController::class, 'store'])->name('supplier.payments.store');
 
     // Stock Management Route
     Route::get('/stock', [StockController::class, 'index'])->name('stock.index');
     Route::post('/stock/adjust', [StockController::class, 'adjustStock'])->name('stock.adjust');
-
 });
 
 // ৩. শুধু 'Warehouse' রোল স্টক এবং প্যাকিং ম্যানেজ করবে
@@ -119,13 +110,17 @@ Route::middleware(['auth', 'permission:approve-orders'])->group(function () {
     Route::post('/orders/{id}/approve', [OrderController::class, 'approve'])->name('orders.approve');
 });
 
-// ৫. শুধু 'Delivery' ম্যান ডেলিভারি স্ট্যাটাস আপডেট করতে পারবে
-Route::middleware(['auth', 'role:Delivery'])->group(function () {
-    Route::get('/delivery/assigned', [DeliveryController::class, 'assignedList'])->name('delivery.assigned');
-    Route::post('/delivery/update-status/{id}', [DeliveryController::class, 'updateStatus'])->name('delivery.update-status');
+// ৫. ডেলিভারি ও ফিল্ড কালেকশন ম্যানেজমেন্ট (Owner, Office এবং Delivery রোল ভিত্তিক)
+Route::middleware(['auth', 'role:Owner|Office|Delivery'])->group(function () {
+    Route::get('/delivery', [DeliveryController::class, 'index'])->name('delivery.index');
+    Route::post('/delivery/assign', [DeliveryController::class, 'assignOrder'])->name('delivery.assign');
+    Route::put('/delivery/status/{order}', [DeliveryController::class, 'updateStatus'])->name('delivery.status.update');
+    Route::post('/delivery/reconcile', [DeliveryController::class, 'reconcileCash'])->name('delivery.reconcile');
+        Route::post('/delivery-payments', [DeliveryController::class, 'store'])->name('delivery.payments.store');
+
 });
 
-
+// সাধারণ অথেন্টিকেটেড ইউজার বা অর্ডার ও কাস্টমার পেমেন্ট রাউটসমূহ
 Route::middleware(['auth'])->group(function () {
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/create', [OrderController::class, 'create'])->name('orders.create');
@@ -135,19 +130,12 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/orders/{order}', [OrderController::class, 'update'])->name('orders.update');
     Route::delete('/orders/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
 
-
-    // নতুন যুক্ত করুন: মডালের মাধ্যমে অর্ডার স্ট্যাটাস ও অ্যাপ্রুভাল আপডেট করার রুট
+    // অর্ডার স্ট্যাটাস ও অ্যাপ্রুভাল আপডেট করার রুট
     Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.status.update');
-    Route::delete('/orders/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
 
     // Customer Payments / Due Collection Routes
     Route::get('/customer-payments', [CustomerPaymentController::class, 'index'])->name('customers.payments.index');
     Route::post('/customer-payments', [CustomerPaymentController::class, 'store'])->name('customers.payments.store');
-
 });
-
-
-
-
 
 require __DIR__.'/auth.php';

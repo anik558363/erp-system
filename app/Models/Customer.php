@@ -46,12 +46,11 @@ public function totalOrdersAmount()
     return $this->orders()->sum('total_amount');
 }
 
-// Total paid amount (order-er paid + collection-er amount)
+
+// Total paid amount (শুধু কালেকশন বা পেমেন্ট টেবিলের মোট অ্যামাউন্ট)
 public function totalPaidAmount()
 {
-    $orderPaid = $this->orders()->sum('paid_amount');
-    $collectedPayment = $this->payments()->sum('amount');
-    return $orderPaid + $collectedPayment;
+    return (float) $this->payments()->sum('amount');
 }
 
 // Real-time Current Due Calculation

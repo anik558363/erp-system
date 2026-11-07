@@ -69,14 +69,21 @@
                             <th class="py-3">Customer & Mobile</th>
                             <th class="py-3">Area</th>
                             <th class="py-3">Salesman</th>
+                            <th class="py-3">Delivery Man</th>
                             <th class="py-3">Items Summary</th>
-                            <th class="py-3 text-end">Order Amount</th>
+                            <th class="py-3">Grand Total</th>
+                            <th class="py-3">Paid Amount</th>
+                            <th class="py-3">Due Amount</th> <!-- নতুন ডিউ কলাম হেডার -->
                             <th class="py-3 text-center">Status</th>
                             <th class="py-3 px-3 text-end">Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($orders as $order)
+                         @php
+                                    // অর্ডারের বকেয়া হিসাব: মোট দাম - পরিশোধিত টাকা
+                                    $dueAmount = max(0, $order->total_amount - $order->paid_amount);
+                                @endphp
                             <tr>
                                 <td class="px-3 font-mono fw-bold text-dark small">{{ $order->order_no }}</td>
                                 <td class="font-mono text-muted small">{{ $order->order_date }}</td>
@@ -89,6 +96,30 @@
                                 <td><span class="badge bg-light text-secondary border font-mono"
                                         style="font-size: 9px;">{{ $order->area->name ?? 'General' }}</span></td>
                                 <td><span class="text-secondary small">{{ $order->salesman->name ?? 'N/A' }}</span></td>
+                                <td>
+                                    @if (auth()->user()->hasRole('Owner|Office'))
+                                        <form action="{{ route('delivery.assign') }}" method="POST"
+                                            class="d-flex align-items-center gap-1">
+                                            @csrf
+                                            <input type="hidden" name="order_id" value="{{ $order->id }}">
+                                            <select name="delivery_man_id" class="form-select form-select-sm font-mono py-1"
+                                                style="font-size: 11px; width: 140px;" onchange="this.form.submit()">
+                                                <option value="">Select Rider</option>
+                                                @foreach ($deliveryMen as $man)
+                                                    <option value="{{ $man->id }}"
+                                                        {{ $order->delivery_man_id == $man->id ? 'selected' : '' }}>
+                                                        {{ $man->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </form>
+                                    @else
+                                        <span class="badge bg-secondary-subtle text-dark border font-mono px-2 py-1"
+                                            style="font-size: 10px;">
+                                            {{ $order->deliveryMan->name ?? 'Assigned to You' }}
+                                        </span>
+                                    @endif
+                                </td>
                                 <td class="px-3">
                                     @if ($order->items && $order->items->count() > 0)
                                         <div class="d-flex align-items-center gap-2">
@@ -100,8 +131,18 @@
                                         <span class="text-muted small">No items</span>
                                     @endif
                                 </td>
-                                <td class="text-end font-mono fw-bold text-dark">
-                                    ৳{{ number_format($order->total_amount, 2) }}</td>
+                                <td style="font-size: 14px" class="">৳{{ number_format($order->total_amount, 2) }}</td>
+
+                                <!-- পেইড অ্যামাউন্ট -->
+                                <td style="font-size: 14px" class=" text-success font-mono">
+                                    ৳{{ number_format($order->paid_amount, 2) }}
+                                </td>
+
+                                <!-- ডিউ বা বকেয়া অ্যামাউন্ট (নতুন কলাম) -->
+                                <td style="font-size: 14px" class=" text-danger font-mono">
+                                    ৳{{ number_format($dueAmount, 2) }}
+                                </td>
+
                                 <td class="text-center">
                                     @php
                                         $statusClass = match ($order->status) {
@@ -264,11 +305,12 @@
                                 <select id="customerSelect" name="customer_id" class="form-select shadow-none" required>
                                     <option value="">-- Select Customer --</option>
                                     @foreach ($customers ?? [] as $customer)
-                                        <option value="{{ $customer->id }}" data-name="{{ $customer->name }}"
-                                            data-shop="{{ $customer->shop_name ?? $customer->name }}"
+                                        <option value="{{ $customer->id }}" data-name="{{ $customer->proprietor_name }}"
+                                            data-shop="{{ $customer->shop_name ?? $customer->proprietor_name }}"
                                             data-phone="{{ $customer->phone ?? 'N/A' }}"
                                             data-area="{{ $customer->area->name ?? 'General' }}">
-                                            {{ $customer->name }} (Area: {{ $customer->area->name ?? 'General' }})
+                                            {{ $customer->proprietor_name }} (Area:
+                                            {{ $customer->area->name ?? 'General' }})
                                         </option>
                                     @endforeach
                                 </select>
@@ -686,7 +728,7 @@
             }
         }
 
-function openOrderDetailsModal(order) {
+        function openOrderDetailsModal(order) {
             document.getElementById('modalOrderNo').innerText = order.order_no;
             document.getElementById('modalOrderDate').innerText = order.order_date;
             document.getElementById('modalOrderStatus').innerText = order.status;
@@ -698,7 +740,8 @@ function openOrderDetailsModal(order) {
             }
 
             document.getElementById('modalCustName').innerText = customerName;
-            document.getElementById('modalCustShop').innerText = order.customer ? (order.customer.shop_name || customerName) : 'N/A';
+            document.getElementById('modalCustShop').innerText = order.customer ? (order.customer.shop_name ||
+                customerName) : 'N/A';
             document.getElementById('modalCustPhone').innerText = order.customer ? (order.customer.phone || 'N/A') : 'N/A';
             document.getElementById('modalCustArea').innerText = order.area ? order.area.name : 'General';
 
@@ -736,7 +779,8 @@ function openOrderDetailsModal(order) {
             if (order.items && order.items.length > 0) {
                 order.items.forEach((item, index) => {
                     let productName = item.product ? item.product.name : 'Product #' + item.product_id;
-                    let productImage = (item.product && item.product.image) ? `/storage/${item.product.image}` : 'https://via.placeholder.com/40';
+                    let productImage = (item.product && item.product.image) ? `/storage/${item.product.image}` :
+                        'https://via.placeholder.com/40';
                     let lineTotal = parseFloat(item.line_total || (item.quantity * item.unit_rate)).toFixed(2);
 
                     itemsList.innerHTML += `
@@ -885,6 +929,5 @@ function openOrderDetailsModal(order) {
             `);
             printWindow.document.close();
         }
-
     </script>
 @endsection
