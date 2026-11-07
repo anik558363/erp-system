@@ -72,7 +72,7 @@
 
                     <li class="nav-item">
                         <a href="{{ route('customers.index') }}"
-                            class="nav-link {{ request()->routeIs('customers.*') ? 'active' : '' }}">
+                            class="nav-link {{ request()->routeIs('customers.index') || request()->routeIs('customers.edit') ? 'active' : '' }}">
                             <i data-lucide="users" class="icon-sm me-2"></i>Customers
                         </a>
                     </li>
@@ -91,46 +91,60 @@
                         </a>
                     </li>
 
-                    <a href="{{ route('supplier.payments.index') }}"
-                        class="nav-link {{ request()->routeIs('supplier.payments.*') ? 'active' : '' }}">
-                        <i data-lucide="credit-card" class="icon-sm me-2"></i> Supplier Payments
-                    </a>
+                    <li class="nav-item">
+                        <a href="{{ route('supplier.payments.index') }}"
+                            class="nav-link {{ request()->routeIs('supplier.payments.*') ? 'active' : '' }}">
+                            <i data-lucide="credit-card" class="icon-sm me-2"></i> Supplier Payments
+                        </a>
+                    </li>
 
-                    <a href="{{ route('stock.index') }}"
-                        class="nav-link {{ request()->routeIs('stock.*') ? 'active' : '' }}">
-                        <i data-lucide="box" class="icon-sm me-2"></i> Stock Inventory
-                    </a>
+                    <li class="nav-item">
+                        <a href="{{ route('stock.index') }}"
+                            class="nav-link {{ request()->routeIs('stock.*') ? 'active' : '' }}">
+                            <i data-lucide="box" class="icon-sm me-2"></i> Stock Inventory
+                        </a>
+                    </li>
 
                     <li class="nav-item">
                         <a href="#" class="nav-link"><i data-lucide="user-check" class="icon-sm me-2"></i>Salesmen</a>
                     </li>
                     <li class="nav-item">
                         <a href="{{ route('orders.index') }}"
-                            class="nav-link d-flex align-items-center justify-content-between">
+                            class="nav-link d-flex align-items-center justify-content-between {{ request()->routeIs('orders.*') ? 'active' : '' }}">
                             <span><i data-lucide="clipboard-list" class="icon-sm me-2"></i>Orders</span>
                             <span class="badge rounded-pill bg-warning text-dark">1</span>
                         </a>
                     </li>
+
+                    <!-- Delivery Menu Route Added -->
                     <li class="nav-item">
-                        <a href="delivery.html" class="nav-link"><i data-lucide="truck"
-                                class="icon-sm me-2"></i>Delivery</a>
+                        <a href="{{ route('delivery.index') }}" class="nav-link {{ request()->routeIs('delivery.*') ? 'active' : '' }}">
+                            <i data-lucide="truck" class="icon-sm me-2"></i>Delivery
+                        </a>
                     </li>
+
                     <li class="nav-item">
                         <a href="#" class="nav-link"><i data-lucide="rotate-ccw" class="icon-sm me-2"></i>Returns</a>
                     </li>
+
+                    <!-- Payments menu -->
                     <li class="nav-item">
-                        <a href="#" class="nav-link"><i data-lucide="credit-card"
-                                class="icon-sm me-2"></i>Payments</a>
+                        <a href="{{ route('customers.payments.index') }}"
+                            class="nav-link {{ request()->routeIs('customers.payments.*') ? 'active' : '' }}">
+                            <i data-lucide="credit-card" class="icon-sm me-2"></i>Payments & Collections
+                        </a>
                     </li>
+
                     <li class="nav-item">
                         <a href="#" class="nav-link"><i data-lucide="book-open" class="icon-sm me-2"></i>Ledger</a>
                     </li>
+
                     <li class="nav-item">
-                        <a href="{{ route('expenses.index') }}" class="nav-link"><i data-lucide="receipt"
+                        <a href="{{ route('expenses.index') }}" class="nav-link {{ request()->routeIs('expenses.*') ? 'active' : '' }}"><i data-lucide="receipt"
                                 class="icon-sm me-2"></i>Expenses</a>
                     </li>
                     <li class="nav-item">
-                        <a href="{{ route('reports.index') }}" class="nav-link"><i data-lucide="bar-chart-2"
+                        <a href="{{ route('reports.index') }}" class="nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}"><i data-lucide="bar-chart-2"
                                 class="icon-sm me-2"></i>Reports</a>
                     </li>
                 @endrole
@@ -143,27 +157,20 @@
                     </li>
                     <li class="nav-item">
                         <a href="#" class="nav-link"><i data-lucide="clipboard-list"
-                                class="icon-sm me-2"></i>Packing
-                            Orders</a>
+                                class="icon-sm me-2"></i>Packing Orders</a>
                     </li>
                 @endrole
 
                 <!-- ৪. DELIVERY রোলের জন্য মেনু -->
                 @role('Delivery')
                     <li class="nav-item">
-                        <a href="{{ route('delivery.assigned') }}" class="nav-link"><i data-lucide="truck"
+                        <a href="{{ route('delivery.index') }}" class="nav-link {{ request()->routeIs('delivery.*') ? 'active' : '' }}"><i data-lucide="truck"
                                 class="icon-sm me-2"></i>Assigned Deliveries</a>
                     </li>
                 @endrole
 
                 <!-- ৫. SALESMAN রোলের জন্য মেনু -->
                 @role('Salesman')
-                    {{-- <li class="nav-item">
-                        <a href="#" class="nav-link"><i data-lucide="shopping-bag" class="icon-sm me-2"></i>My
-                            Orders
-                            & Sales</a>
-                    </li> --}}
-
                     <li class="nav-item">
                         <a href="{{ route('orders.index') }}"
                             class="nav-link d-flex align-items-center justify-content-between">

@@ -35,4 +35,34 @@ public function posSales()
 {
     return $this->hasMany(PosSale::class, 'customer_id');
 }
+
+public function payments() {
+    return $this->hasMany(CustomerPayment::class);
+}
+
+// Total purchase amount (order-er total_amount)
+public function totalOrdersAmount()
+{
+    return $this->orders()->sum('total_amount');
+}
+
+
+// Total paid amount (শুধু কালেকশন বা পেমেন্ট টেবিলের মোট অ্যামাউন্ট)
+public function totalPaidAmount()
+{
+    return (float) $this->payments()->sum('amount');
+}
+
+// Real-time Current Due Calculation
+public function calculateCurrentDue()
+{
+    $openingDue = $this->opening_due ?? 0;
+    $totalOrders = $this->totalOrdersAmount();
+    $totalPaid = $this->totalPaidAmount();
+
+    // Formula: Opening Due + Total Orders - Total Paid
+    return ($openingDue + $totalOrders) - $totalPaid;
+}
+
+
 }

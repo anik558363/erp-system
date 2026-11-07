@@ -10,10 +10,17 @@ use Illuminate\Support\Facades\Storage;
 
 class CustomerController extends Controller
 {
-    // Customer list ebong page view
+  // Customer list ebong page view
     public function index()
     {
         $customers = Customer::with(['area', 'salesman'])->latest()->paginate(10);
+
+        // প্রতিটি কাস্টমারের current_due রিয়েল-টাইম হিসাব করে আপডেট করে নেওয়া
+        foreach ($customers as $customer) {
+            $customer->current_due = $customer->calculateCurrentDue();
+            $customer->save(); // ডাটাবেজে সঠিক ডিউ সেভ হয়ে যাবে
+        }
+
         $areas = Area::where('is_active', true)->get();
         $salesmen = User::role('Salesman')->get();
 
@@ -113,4 +120,20 @@ class CustomerController extends Controller
         $customer->delete();
         return redirect()->route('customers.index')->with('success', 'Customer deleted successfully.');
     }
+
+
+    public function ledger(Customer $customer)
+{
+    // Kustomer-er shob orders ebong payments collection load kora
+    $orders = $customer->orders()->latest()->get();
+    $payments = $customer->payments()->latest()->get();
+
+    // Opening due, total purchase, total paid ebong current due hisab kora
+    $openingDue = $customer->opening_due ?? 0;
+    $totalOrders = $customer->totalOrdersAmount();
+    $totalPaid = $customer->totalPaidAmount();
+    $currentDue = $customer->calculateCurrentDue();
+
+    return view('customers.ledger', compact('customer', 'orders', 'payments', 'openingDue', 'totalOrders', 'totalPaid', 'currentDue'));
+}
 }

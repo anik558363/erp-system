@@ -109,7 +109,7 @@
                         </div>
 
                         <div class="d-flex flex-wrap gap-2 pt-2 border-top">
-                            <a href="#"
+                            <a href="{{ route('customers.ledger', $customer->id) }}"
                                 class="btn btn-outline-secondary btn-sm px-3 d-flex align-items-center gap-1 text-decoration-none"
                                 style="font-size: 12px;">
                                 <i data-lucide="book-open" class="icon-xs"></i> Ledger Book
@@ -284,8 +284,8 @@
     @endif
 
     <!-- ==========================================
-                            MODAL: REGISTER NEW B2B CUSTOMER
-                            ========================================== -->
+                                MODAL: REGISTER NEW B2B CUSTOMER
+                                ========================================== -->
     <div class="modal fade" id="registerCustomerModal" tabindex="-1" aria-labelledby="registerCustomerModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
