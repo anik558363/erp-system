@@ -197,11 +197,38 @@
                                 class="icon-sm me-2"></i>Ledger</a>
                     </li>
 
+                    <!-- Expense Management Menu -->
                     <li class="nav-item">
-                        <a href="{{ route('expenses.index') }}"
-                            class="nav-link {{ request()->routeIs('expenses.*') ? 'active' : '' }}"><i
-                                data-lucide="receipt" class="icon-sm me-2"></i>Expenses</a>
+                        <a href="#expenseSubmenu" data-bs-toggle="collapse"
+                            class="nav-link d-flex align-items-center justify-content-between {{ request()->routeIs('expenses.*') || request()->routeIs('expense.categories.*') ? 'active' : '' }}">
+                            <div class="d-flex align-items-center">
+                                <i data-lucide="wallet" class="icon-sm me-2"></i>
+                                <span>Expense Management</span>
+                            </div>
+                            <i data-lucide="chevron-down" class="icon-xs"></i>
+                        </a>
+                        <div class="collapse {{ request()->routeIs('expenses.*') || request()->routeIs('expense.categories.*') ? 'show' : '' }}"
+                            id="expenseSubmenu">
+                            <ul class="nav flex-column ms-3 ps-2 border-start border-secondary border-opacity-25 mt-1 gap-1"
+                                style="font-size: 12px;">
+                                <!-- ১. Expense List -->
+                                <li class="nav-item">
+                                    <a href="{{ route('expenses.index') }}"
+                                        class="nav-link py-1 {{ request()->routeIs('expenses.*') ? 'fw-bold text-emerald' : 'text-secondary' }}">
+                                        All Expenses
+                                    </a>
+                                </li>
+                                <!-- ২. Expense Categories -->
+                                <li class="nav-item">
+                                    <a href="{{ route('expense.categories.index') }}"
+                                        class="nav-link py-1 {{ request()->routeIs('expense.categories.*') ? 'fw-bold text-emerald' : 'text-secondary' }}">
+                                        Categories
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
                     </li>
+
                     <li class="nav-item">
                         <a href="{{ route('reports.index') }}"
                             class="nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}"><i

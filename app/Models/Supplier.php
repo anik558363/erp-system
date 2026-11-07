@@ -20,9 +20,15 @@ class Supplier extends Model
         'status',
     ];
 
-    // 1ta Supplier-er under-e onekgula Purchase invoice thakte pare
+    // ১. Supplier has many purchases
     public function purchases()
     {
-        return $this->hasMany(Purchase::class);
+        return $this->hasMany(Purchase::class, 'supplier_id');
+    }
+
+    // ২. Supplier has many payments (এই মেথডটি মিসিং ছিল)
+    public function payments()
+    {
+        return $this->hasMany(SupplierPayment::class, 'supplier_id');
     }
 }

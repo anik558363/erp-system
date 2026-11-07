@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
 
+
 class SupplierController extends Controller
 {
     public function index()
@@ -68,4 +69,20 @@ class SupplierController extends Controller
         $supplier->delete();
         return redirect()->route('suppliers.index')->with('success', 'Supplier deleted successfully.');
     }
+
+    public function ledger(Supplier $supplier)
+{
+    // সাপ্লায়ারের সমস্ত কেনাকাটা (Purchases)
+    $purchases = $supplier->purchases()->latest('purchase_date')->get();
+
+    // সাপ্লায়ারকে দেওয়া সমস্ত পেমেন্ট (Supplier Payments)
+    $payments = $supplier->payments()->latest('payment_date')->get();
+
+    // সামারি হিসাব
+    $totalPurchases = $purchases->sum('total_amount');
+    $totalPaid = $payments->sum('amount');
+    $currentDue = $supplier->current_due; // অথবা হিসাব করে বের করতে পারেন
+
+    return view('suppliers.ledger', compact('supplier', 'purchases', 'payments', 'totalPurchases', 'totalPaid', 'currentDue'));
+}
 }
