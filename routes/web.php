@@ -19,6 +19,17 @@ use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\SupplierPaymentController;
 use App\Http\Controllers\CustomerPaymentController;
+use App\Http\Controllers\PosController; // POS কন্ট্রোলার ইম্পোর্ট
+use App\Http\Controllers\PosShiftController;
+use App\Http\Controllers\PosRegisterController;
+
+use App\Http\Controllers\PosReturnController;
+
+
+
+
+
+
 
 // ১. রুট ইউআরএল ('/') ওপেন করলে সরাসরি লগইন পেজে রিডাইরেক্ট করবে
 Route::get('/', function () {
@@ -42,10 +53,36 @@ Route::middleware('auth')->group(function () {
 // ERP SYSTEM ROLE & PERMISSION ROUTES
 // ==========================================
 
-// ২. শুধু 'Owner' এবং 'Office' রোল এই পেজগুলো পাবে
+// ২. শুধু 'Owner' এবং 'Office' রোল এই পেজগুলো পাবে (POS সহ)
 Route::middleware(['auth', 'role:Owner|Office'])->group(function () {
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
     Route::get('/expenses', [ExpenseController::class, 'index'])->name('expenses.index');
+
+    // POS Shift Routes
+    Route::get('/pos/shift', [PosShiftController::class, 'index'])->name('pos.shift.index');
+    Route::post('/pos/shift/open', [PosShiftController::class, 'openShift'])->name('pos.shift.open');
+    Route::post('/pos/shift/close/{shift}', [PosShiftController::class, 'closeShift'])->name('pos.shift.close');
+
+    // POS Terminal
+    Route::get('/pos', [PosController::class, 'index'])->name('pos.index');
+    Route::post('/pos/store', [PosController::class, 'store'])->name('pos.store');
+
+// POS Register CRUD Routes
+    Route::get('/pos/registers', [PosRegisterController::class, 'index'])->name('pos.registers.index');
+    Route::post('/pos/registers', [PosRegisterController::class, 'store'])->name('pos.registers.store');
+    Route::put('/pos/registers/{register}', [PosRegisterController::class, 'update'])->name('pos.registers.update');
+    Route::delete('/pos/registers/{register}', [PosRegisterController::class, 'destroy'])->name('pos.registers.destroy');
+
+
+    // POS Sales History & Invoices Routes
+Route::get('/pos/sales', [PosController::class, 'salesHistory'])->name('pos.sales.index');
+Route::get('/pos/sales/{sale}', [PosController::class, 'showReceipt'])->name('pos.sales.receipt');
+Route::delete('/pos/sales/{sale}', [PosController::class, 'destroySale'])->name('pos.sales.destroy');
+
+// POS Returns Routes
+Route::get('/pos/returns', [PosReturnController::class, 'index'])->name('pos.returns.index');
+Route::get('/pos/returns/create', [PosReturnController::class, 'create'])->name('pos.returns.create');
+Route::post('/pos/returns', [PosReturnController::class, 'store'])->name('pos.returns.store');
 
     // Category Management Routes
     Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
@@ -116,8 +153,7 @@ Route::middleware(['auth', 'role:Owner|Office|Delivery'])->group(function () {
     Route::post('/delivery/assign', [DeliveryController::class, 'assignOrder'])->name('delivery.assign');
     Route::put('/delivery/status/{order}', [DeliveryController::class, 'updateStatus'])->name('delivery.status.update');
     Route::post('/delivery/reconcile', [DeliveryController::class, 'reconcileCash'])->name('delivery.reconcile');
-        Route::post('/delivery-payments', [DeliveryController::class, 'store'])->name('delivery.payments.store');
-
+    Route::post('/delivery-payments', [DeliveryController::class, 'store'])->name('delivery.payments.store');
 });
 
 // সাধারণ অথেন্টিকেটেড ইউজার বা অর্ডার ও কাস্টমার পেমেন্ট রাউটসমূহ

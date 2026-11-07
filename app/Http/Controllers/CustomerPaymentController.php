@@ -27,14 +27,12 @@ class CustomerPaymentController extends Controller
     }
 
 
-    // ফিল্ড থেকে বকেয়া কালেকশন বা পেমেন্ট সেভ করা
+      // ফিল্ড থেকে বকেয়া কালেকশন বা পেমেন্ট সেভ করা
     public function store(Request $request)
     {
-
-
-
         $request->validate([
             'customer_id' => 'required|exists:customers,id',
+            'order_id' => 'nullable|exists:orders,id',
             'amount' => 'required|numeric|min:0.01',
             'payment_date' => 'required|date',
             'payment_method' => 'required|string',
@@ -45,7 +43,7 @@ class CustomerPaymentController extends Controller
             $paymentNo = 'PAY-' . date('ymd') . '-' . strtoupper(Str::random(4));
 
             // ১. পেমেন্ট রেকর্ড তৈরি করা
-            CustomerPayment::create([
+            $payment = CustomerPayment::create([
                 'payment_no' => $paymentNo,
                 'customer_id' => $request->customer_id,
                 'order_id' => $request->order_id ?? null,
@@ -57,7 +55,16 @@ class CustomerPaymentController extends Controller
                 'payment_date' => $request->payment_date,
             ]);
 
-            // ২. কাস্টমারের বর্তমান ডিউ (current_due) নিখুঁতভাবে রিক্যালকুলেট করে আপডেট করা
+            // ২. সবচেয়ে গুরুত্বপূর্ণ অংশ: যদি পেমেন্টের সাথে order_id থাকে, তবে ওই অর্ডারের paid_amount আপডেট করা
+            if (!empty($request->order_id)) {
+                $order = Order::find($request->order_id);
+                if ($order) {
+                    $order->paid_amount = (float)$order->paid_amount + (float)$request->amount;
+                    $order->save();
+                }
+            }
+
+            // ৩. কাস্টমারের বর্তমান ডিউ (current_due) নিখুঁতভাবে রিক্যালকুলেট করে আপডেট করা
             $customer = Customer::findOrFail($request->customer_id);
 
             $openingDue = (float) ($customer->opening_due ?? 0);
@@ -65,19 +72,22 @@ class CustomerPaymentController extends Controller
             $totalOrderPaid = (float) $customer->orders()->sum('paid_amount');
             $totalExtraPayments = (float) $customer->payments()->sum('amount');
 
-            // সঠিক সূত্র: (ওপেনিং ডিউ + মোট অর্ডার) - (অর্ডারের সাথে দেওয়া পেইড + আলাদা পেমেন্টগুলো)
             $totalPaidAll = $totalOrderPaid + $totalExtraPayments;
             $customer->current_due = max(0, ($openingDue + $totalOrdersAmount) - $totalPaidAll);
             $customer->save();
 
             DB::commit();
-            return redirect()->back()->with('success', 'Payment collected successfully and customer ledger updated!');
+            return redirect()->back()->with('success', 'Payment collected, order paid amount updated, and customer ledger synchronized!');
 
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->withErrors(['error' => $e->getMessage()])->withInput();
         }
     }
+
+
+
+
 
 
 }

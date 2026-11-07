@@ -27,4 +27,10 @@ class PosSale extends Model
     {
         return $this->belongsTo(User::class, 'cashier_id');
     }
+
+    // PosRegister এর সাথে রিলেশন
+    public function register()
+    {
+        return $this->belongsTo(PosRegister::class, 'register_id');
+    }
 }
