@@ -95,6 +95,12 @@
                                 </td>
                                 <td class="text-end px-4">
                                     <div class="d-inline-flex align-items-center gap-1">
+
+                                        <a href="{{ route('suppliers.ledger', $supplier->id) }}"
+                                            class="btn btn-outline-dark btn-sm py-0 px-2" style="font-size: 11px;">
+                                            Ledger Book
+                                        </a>
+
                                         <!-- Edit Button -->
                                         <button class="btn btn-sm btn-light border text-primary p-1 px-2 shadow-none"
                                             data-bs-toggle="modal" data-bs-target="#editSupplierModal{{ $supplier->id }}"
@@ -142,7 +148,8 @@
                                                             value="{{ $supplier->company_name }}" required>
                                                     </div>
                                                     <div class="col-md-6">
-                                                        <label class="form-label small fw-semibold text-dark">Representative
+                                                        <label
+                                                            class="form-label small fw-semibold text-dark">Representative
                                                             Name *</label>
                                                         <input type="text" name="name"
                                                             class="form-control form-control-sm py-2"

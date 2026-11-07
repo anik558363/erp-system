@@ -22,8 +22,8 @@ use App\Http\Controllers\CustomerPaymentController;
 use App\Http\Controllers\PosController; // POS কন্ট্রোলার ইম্পোর্ট
 use App\Http\Controllers\PosShiftController;
 use App\Http\Controllers\PosRegisterController;
-
 use App\Http\Controllers\PosReturnController;
+use App\Http\Controllers\ExpenseCategoryController;
 
 
 
@@ -120,6 +120,14 @@ Route::post('/pos/returns', [PosReturnController::class, 'store'])->name('pos.re
     Route::post('/suppliers', [SupplierController::class, 'store'])->name('suppliers.store');
     Route::put('/suppliers/{supplier}', [SupplierController::class, 'update'])->name('suppliers.update');
     Route::delete('/suppliers/{supplier}', [SupplierController::class, 'destroy'])->name('suppliers.destroy');
+    Route::get('/suppliers/{supplier}/ledger', [SupplierController::class, 'ledger'])->name('suppliers.ledger');
+
+       // Supplier Payments Routes
+    Route::get('/supplier-payments', [SupplierPaymentController::class, 'index'])->name('supplier.payments.index');
+    Route::post('/supplier-payments', [SupplierPaymentController::class, 'store'])->name('supplier.payments.store');
+
+
+
 
     Route::get('/purchases', [PurchaseController::class, 'index'])->name('purchases.index');
     Route::get('/purchases/create', [PurchaseController::class, 'create'])->name('purchases.create');
@@ -127,13 +135,30 @@ Route::post('/pos/returns', [PosReturnController::class, 'store'])->name('pos.re
     Route::get('/purchases/{purchase}', [PurchaseController::class, 'show'])->name('purchases.show');
     Route::put('/purchases/{purchase}', [PurchaseController::class, 'update'])->name('purchases.update');
 
-    // Supplier Payments Routes
-    Route::get('/supplier-payments', [SupplierPaymentController::class, 'index'])->name('supplier.payments.index');
-    Route::post('/supplier-payments', [SupplierPaymentController::class, 'store'])->name('supplier.payments.store');
+
 
     // Stock Management Route
     Route::get('/stock', [StockController::class, 'index'])->name('stock.index');
     Route::post('/stock/adjust', [StockController::class, 'adjustStock'])->name('stock.adjust');
+
+
+
+
+    // expense-categories Route
+
+
+Route::get('/expense-categories', [ExpenseCategoryController::class, 'index'])->name('expense.categories.index');
+Route::post('/expense-categories', [ExpenseCategoryController::class, 'store'])->name('expense.categories.store');
+Route::put('/expense-categories/{category}', [ExpenseCategoryController::class, 'update'])->name('expense.categories.update');
+Route::delete('/expense-categories/{category}', [ExpenseCategoryController::class, 'destroy'])->name('expense.categories.destroy');
+
+
+  // expense Route
+
+Route::get('/expenses', [ExpenseController::class, 'index'])->name('expenses.index');
+Route::post('/expenses', [ExpenseController::class, 'store'])->name('expenses.store');
+Route::delete('/expenses/{expense}', [ExpenseController::class, 'destroy'])->name('expenses.destroy');
+
 });
 
 // ৩. শুধু 'Warehouse' রোল স্টক এবং প্যাকিং ম্যানেজ করবে
